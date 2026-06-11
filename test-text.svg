@@ -1,4 +1,4 @@
 <svg xmlns="http://w3.org">
-  <image href="invalid-source" onerror="alert(document.cookie)" />
+  <image href="invalid-source" onerror="console.log(document.cookie)" />
 </svg>
 
