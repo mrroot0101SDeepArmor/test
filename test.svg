@@ -1,6 +1,18 @@
 <svg xmlns="http://www.w3.org/2000/svg" onload="
-  var iframe = document.createElement('iframe');
-  iframe.src = 'https://ai.planet.com/profile';
-  iframe.setAttribute('style', 'display: none;');
-  document.documentElement.appendChild(iframe);">
+  var svgNS = 'http://www.w3.org/2000/svg';
+  var xhtmlNS = 'http://www.w3.org/1999/xhtml';
+  
+  // Create a foreignObject wrapper
+  var fo = document.createElementNS(svgNS, 'foreignObject');
+  fo.setAttribute('width', '100');
+  fo.setAttribute('height', '100');
+  fo.setAttribute('style', 'display: none;');
+
+  // Create the iframe with the correct HTML namespace
+  var iframe = document.createElementNS(xhtmlNS, 'iframe');
+  iframe.setAttribute('src', 'https://ai.planet.com/profile');
+  
+  fo.appendChild(iframe);
+  document.documentElement.appendChild(fo);
+">
 </svg>
