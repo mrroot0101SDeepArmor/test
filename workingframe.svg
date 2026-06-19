@@ -1,0 +1,205 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" viewBox="0 0 1000 800">
+    <defs>
+        <style>
+            text { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif; }
+            .header { font-weight: bold; fill: #1a1a1a; }
+            .subheader { fill: #666; }
+            .status-good { fill: #4CAF50; }
+            .status-warning { fill: #FF9800; }
+            .info-text { fill: #555; font-size: 13px; }
+        </style>
+        
+        <!-- Gradient for header -->
+        <linearGradient id="headerGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" style="stop-color:#1a237e;stop-opacity:1" />
+            <stop offset="100%" style="stop-color:#0d47a1;stop-opacity:1" />
+        </linearGradient>
+        
+        <!-- Shadow filter -->
+        <filter id="shadow" x="-2%" y="-2%" width="104%" height="104%">
+            <feDropShadow dx="0" dy="2" stdDeviation="4" flood-opacity="0.15"/>
+        </filter>
+    </defs>
+    
+    <!-- Background -->
+    <rect width="1000" height="800" fill="#f5f7fa" rx="12"/>
+    
+    <!-- Header -->
+    <rect x="0" y="0" width="1000" height="70" fill="url(#headerGrad)" rx="12 12 0 0"/>
+    <text x="30" y="44" class="header" fill="white" font-size="22">
+        🌍 ai.planet.com
+    </text>
+    <text x="850" y="44" fill="white" font-size="13" text-anchor="end">
+        Loaded from blob:${window.location.origin}
+    </text>
+    
+    <!-- Status Bar -->
+    <rect x="20" y="85" width="960" height="35" fill="white" rx="6" filter="url(#shadow)"/>
+    <circle cx="40" cy="102" r="6" fill="#4CAF50"/>
+    <text x="55" y="107" class="info-text" fill="#333">
+        Status: Connected  •  Origin: <tspan fill="#1a237e" font-weight="bold">${window.location.origin}</tspan>  •  Auth: ✅ Active
+    </text>
+    
+    <!-- Iframe Container -->
+    <foreignObject x="20" y="135" width="960" height="645">
+        <div xmlns="http://www.w3.org/1999/xhtml" style="width:100%;height:100%;">
+            <iframe 
+                id="planetIframe"
+                src="https://ai.planet.com/profile" 
+                style="width:100%;height:100%;border:2px solid #e0e0e0;border-radius:8px;background:white;"
+                sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-modals"
+                allow="geolocation; microphone; camera; midi; encrypted-media; autoplay; fullscreen"
+                allowfullscreen="true"
+                loading="eager"
+            ></iframe>
+        </div>
+    </foreignObject>
+    
+    <!-- Footer -->
+    <rect x="0" y="790" width="1000" height="10" fill="url(#headerGrad)" rx="0 0 12 12"/>
+    <text x="500" y="795" text-anchor="middle" fill="white" font-size="10" opacity="0.8">
+        Secure blob URL • ${new Date().toLocaleString()}
+    </text>
+    
+    <!-- JavaScript for monitoring and interaction -->
+    <script type="text/javascript">
+        <![CDATA[
+            console.clear();
+            console.log('═══════════════════════════════════════');
+            console.log('🌍 AI.PLANET.COM - BLOB URL VIEWER');
+            console.log('═══════════════════════════════════════');
+            console.log('✅ SVG loaded successfully');
+            console.log('📍 Origin:', window.location.origin);
+            console.log('📍 URL:', window.location.href);
+            console.log('📌 Mode: Blob URL (same origin)');
+            
+            // Track iframe loading
+            var iframeLoadStatus = {
+                loaded: false,
+                attempts: 0,
+                startTime: Date.now()
+            };
+            
+            function checkIframe() {
+                var iframe = document.getElementById('planetIframe');
+                if (!iframe) {
+                    console.warn('⚠️ Iframe not found');
+                    return;
+                }
+                
+                iframeLoadStatus.attempts++;
+                
+                try {
+                    // Try to access iframe content
+                    var doc = iframe.contentDocument || iframe.contentWindow?.document;
+                    
+                    if (doc && doc.readyState === 'complete') {
+                        if (!iframeLoadStatus.loaded) {
+                            iframeLoadStatus.loaded = true;
+                            var loadTime = (Date.now() - iframeLoadStatus.startTime) / 1000;
+                            console.log('✅ IFRAME LOADED SUCCESSFULLY!');
+                            console.log('  📍 Time to load:', loadTime.toFixed(2) + 's');
+                            console.log('  📍 Title:', doc.title || 'No title');
+                            console.log('  📍 Content length:', doc.body?.innerHTML?.length || 0);
+                            console.log('  📍 readyState:', doc.readyState);
+                            
+                            // Update status display
+                            updateStatus('✅ Connected', '#4CAF50');
+                        }
+                    } else if (doc) {
+                        console.log('⏳ Iframe loading... (readyState:', doc.readyState || 'unknown', ')');
+                    }
+                } catch(e) {
+                    // CORS or other access issues
+                    if (!iframeLoadStatus.loaded) {
+                        // If we can detect that it loaded despite CORS
+                        try {
+                            // Check if iframe has a src and is not about:blank
+                            if (iframe.src && iframe.src !== 'about:blank' && iframe.src.startsWith('https://')) {
+                                console.log('✅ Iframe appears to be loaded (CORS prevents content access)');
+                                console.log('  📍 This is normal for cross-origin iframes');
+                                console.log('  📌 Content is loaded but cannot be inspected');
+                                iframeLoadStatus.loaded = true;
+                                updateStatus('✅ Connected (CORS)', '#4CAF50');
+                            }
+                        } catch(e2) {
+                            // Ignore
+                        }
+                    }
+                }
+            }
+            
+            function updateStatus(text, color) {
+                try {
+                    var statusText = document.querySelector('.info-text');
+                    if (statusText) {
+                        // Find the status part
+                        var parts = statusText.textContent.split('•');
+                        if (parts.length >= 2) {
+                            statusText.textContent = 'Status: ' + text + '  •' + parts.slice(1).join('•');
+                        }
+                    }
+                } catch(e) {
+                    // Ignore
+                }
+            }
+            
+            // Monitor iframe loading
+            var checkInterval = setInterval(checkIframe, 500);
+            
+            // Also check on window load
+            window.addEventListener('load', function() {
+                console.log('📌 Window load event fired');
+                setTimeout(checkIframe, 500);
+            });
+            
+            // Stop checking after 30 seconds
+            setTimeout(function() {
+                clearInterval(checkInterval);
+                if (!iframeLoadStatus.loaded) {
+                    console.log('⏱️ Timeout: Iframe may still be loading or blocked');
+                    console.log('  📌 Check if authentication is required');
+                    console.log('  📌 Check if iframe is visible');
+                }
+                console.log('\n═══════════════════════════════════════');
+                console.log('📊 FINAL STATUS:');
+                console.log('  📍 Iframe loaded:', iframeLoadStatus.loaded ? '✅ YES' : '❌ NO');
+                console.log('  📍 Attempts:', iframeLoadStatus.attempts);
+                console.log('  📍 Total time:', ((Date.now() - iframeLoadStatus.startTime) / 1000).toFixed(2) + 's');
+                
+                // Check if iframe exists
+                var iframe = document.getElementById('planetIframe');
+                if (iframe) {
+                    console.log('  📍 Iframe src:', iframe.src);
+                    console.log('  📍 Iframe style:', iframe.style.cssText);
+                }
+                console.log('═══════════════════════════════════════');
+            }, 30000);
+            
+            // Add keyboard shortcuts
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'r' && (e.ctrlKey || e.metaKey)) {
+                    e.preventDefault();
+                    console.log('🔄 Reloading iframe...');
+                    var iframe = document.getElementById('planetIframe');
+                    if (iframe) {
+                        iframe.src = iframe.src;
+                    }
+                }
+                if (e.key === 'f' && (e.ctrlKey || e.metaKey)) {
+                    e.preventDefault();
+                    console.log('🔍 Toggle fullscreen...');
+                    var iframe = document.getElementById('planetIframe');
+                    if (iframe && iframe.requestFullscreen) {
+                        iframe.requestFullscreen();
+                    }
+                }
+            });
+            
+            console.log('\n📌 Keyboard shortcuts:');
+            console.log('  Ctrl+R  - Reload iframe');
+            console.log('  Ctrl+F  - Toggle fullscreen');
+            console.log('═══════════════════════════════════════');
+        ]]>
+    </script>
+</svg>
