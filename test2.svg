@@ -1,118 +1,71 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="800" height="600">
-  <!-- Visual indicator -->
-  <rect x="10" y="10" width="780" height="580" fill="#f0f0f0" rx="10"/>
-  <text x="400" y="40" text-anchor="middle" font-family="Arial" font-size="20" fill="#333">
-    Loading iframe to ai.planet.com...
-  </text>
-  
-  <!-- ForeignObject allows HTML content inside SVG -->
-  <foreignObject x="20" y="60" width="760" height="520">
-    <div xmlns="http://www.w3.org/1999/xhtml" style="width:100%;height:100%;">
-      <iframe 
-        src="https://ai.planet.com/" 
-        style="width:100%;height:100%;border:1px solid #4CAF50;border-radius:5px;"
-        sandbox="allow-scripts allow-same-origin allow-forms allow-popups"
-        loading="lazy"
-        allow="geolocation; microphone; camera; midi; encrypted-media"
-      ></iframe>
-    </div>
-  </foreignObject>
-  
-  <!-- Script to monitor iframe loading -->
-  <script type="text/javascript">
-    <![CDATA[
-      console.clear();
-      console.log('═══════════════════════════════════════');
-      console.log('🔍 SVG WITH IFRAME TO ai.planet.com');
-      console.log('═══════════════════════════════════════');
-      
-      console.log('✅ SVG loaded successfully');
-      console.log('📍 Attempting to load iframe to: https://ai.planet.com/');
-      
-      // Track iframe loading status
-      var iframeLoaded = false;
-      
-      // Function to check iframe status
-      function checkIframe() {
-        var fo = document.querySelector('foreignObject');
-        if (fo) {
-          var div = fo.querySelector('div');
-          if (div) {
-            var iframe = div.querySelector('iframe');
-            if (iframe) {
-              console.log('  ✅ iframe element found');
-              console.log('  📍 iframe src:', iframe.src);
-              console.log('  📍 iframe sandbox:', iframe.sandbox.value || 'none');
-              
-              // Add load event listener if not already added
-              if (!iframe._listenerAdded) {
-                iframe._listenerAdded = true;
+    <rect x="10" y="10" width="780" height="580" fill="#f0f0f0" rx="10"/>
+    <text x="400" y="40" text-anchor="middle" font-family="Arial" font-size="20" fill="#333">
+        Testing blob URL origin
+    </text>
+    
+    <foreignObject x="20" y="60" width="760" height="520">
+        <div xmlns="http://www.w3.org/1999/xhtml" style="width:100%;height:100%;">
+            <iframe 
+                src="https://ai.planet.com/" 
+                style="width:100%;height:100%;border:2px solid #4CAF50;border-radius:5px;"
+                sandbox="allow-scripts allow-same-origin allow-forms allow-popups"
+            ></iframe>
+        </div>
+    </foreignObject>
+    
+    <script type="text/javascript">
+        <![CDATA[
+            console.clear();
+            console.log('═══════════════════════════════════════');
+            console.log('🔍 BLOB URL ORIGIN TEST');
+            console.log('═══════════════════════════════════════');
+            console.log('📍 Current URL:', window.location.href);
+            console.log('📍 URL scheme:', window.location.protocol);
+            console.log('📍 Origin:', window.location.origin);
+            console.log('📍 Hostname:', window.location.hostname);
+            
+            // Check if this is a blob URL
+            if (window.location.href.startsWith('blob:')) {
+                console.log('✅ This IS a blob URL');
+                console.log('📌 Origin should be:', window.location.origin);
                 
-                iframe.onload = function() {
-                  iframeLoaded = true;
-                  console.log('  ✅ IFRAME LOADED SUCCESSFULLY!');
-                  console.log('  📍 iframe URL:', iframe.src);
-                  console.log('  📍 iframe readyState:', iframe.contentDocument ? iframe.contentDocument.readyState : 'N/A');
-                  
-                  try {
-                    if (iframe.contentWindow) {
-                      console.log('  📍 iframe contentWindow available');
-                      console.log('  📍 contentWindow.location:', iframe.contentWindow.location.href);
-                      console.log('  📍 contentWindow.origin:', iframe.contentWindow.origin || 'N/A');
-                    }
-                  } catch(e) {
-                    console.warn('  ⚠️ Cannot access contentWindow (CORS):', e.message);
-                  }
-                };
-                
-                iframe.onerror = function(e) {
-                  console.error('  ❌ iframe error:', e);
-                };
-              }
-            }
-          }
-        }
-      }
-      
-      // Check immediately and after delay
-      checkIframe();
-      
-      // Also check after window loads
-      window.addEventListener('load', function() {
-        console.log('\n📌 Window load event fired');
-        checkIframe();
-        
-        // Check iframe content after load
-        setTimeout(function() {
-          var fo = document.querySelector('foreignObject');
-          if (fo) {
-            var div = fo.querySelector('div');
-            if (div) {
-              var iframe = div.querySelector('iframe');
-              if (iframe) {
-                console.log('\n📌 Final status check:');
-                console.log('  📍 iframe.src:', iframe.src);
-                console.log('  📍 iframe.complete:', iframe.complete || 'N/A');
-                console.log('  📍 iframe readyState:', iframe.contentDocument ? iframe.contentDocument.readyState : 'N/A');
-                console.log('  📍 iframe loaded:', iframeLoaded ? '✅ YES' : '⏳ Still loading or error');
-                
-                // Check if content loaded
-                try {
-                  if (iframe.contentDocument && iframe.contentDocument.body) {
-                    console.log('  📍 Content loaded! Title:', iframe.contentDocument.title || 'No title');
-                    console.log('  📍 Body length:', iframe.contentDocument.body.innerHTML.length || 0);
-                  }
-                } catch(e) {
-                  console.warn('  ⚠️ Cannot access contentDocument (CORS):', e.message);
+                // Check if origin matches ai.planet.com
+                if (window.location.origin === 'https://ai.planet.com') {
+                    console.log('✅ Origin matches https://ai.planet.com');
+                    console.log('✅ frame-ancestors "self" should allow this');
+                    console.log('📌 Iframe should load successfully!');
+                } else {
+                    console.log('⚠️ Origin is:', window.location.origin);
+                    console.log('📌 This may not match "self" or firebaseapp.com');
                 }
-              }
+            } else {
+                console.log('❌ This is NOT a blob URL');
+                console.log('📌 URL type:', window.location.href);
             }
-          }
-        }, 3000);
-      });
-      
-      console.log('\n⏱️ Test running...');
-      console.log('═══════════════════════════════════════');
-    ]]>
-  </script>
+            
+            // Monitor iframe
+            setTimeout(function() {
+                var iframe = document.querySelector('iframe');
+                if (iframe) {
+                    console.log('\n📌 Iframe status:');
+                    try {
+                        var doc = iframe.contentDocument || iframe.contentWindow?.document;
+                        if (doc && doc.body && doc.body.innerHTML.length > 0) {
+                            console.log('✅ IFRAME CONTENT LOADED!');
+                            console.log('📝 Title:', doc.title);
+                            console.log('📝 Content length:', doc.body.innerHTML.length);
+                        } else {
+                            console.log('⏳ Iframe loaded but content not accessible');
+                        }
+                    } catch(e) {
+                        console.log('⏳ Iframe loaded, CORS prevents content access');
+                        console.log('📌 This is normal if cross-origin');
+                    }
+                }
+            }, 3000);
+            
+            console.log('\n═══════════════════════════════════════');
+        ]]>
+    </script>
 </svg>
