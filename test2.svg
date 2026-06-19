@@ -2,58 +2,63 @@
   <!-- Visual indicator -->
   <rect x="10" y="10" width="780" height="580" fill="#f0f0f0" rx="10"/>
   <text x="400" y="40" text-anchor="middle" font-family="Arial" font-size="20" fill="#333">
-    Loading iframe from SVG...
+    Loading iframe to ai.planet.com...
   </text>
   
   <!-- ForeignObject allows HTML content inside SVG -->
   <foreignObject x="20" y="60" width="760" height="520">
     <div xmlns="http://www.w3.org/1999/xhtml" style="width:100%;height:100%;">
       <iframe 
-        src="https://ai.planet.com" 
-        style="width:100%;height:100%;border:1px solid #ccc;border-radius:5px;"
-        sandbox="allow-scripts allow-same-origin allow-forms"
+        src="https://ai.planet.com/" 
+        style="width:100%;height:100%;border:1px solid #4CAF50;border-radius:5px;"
+        sandbox="allow-scripts allow-same-origin allow-forms allow-popups"
         loading="lazy"
+        allow="geolocation; microphone; camera; midi; encrypted-media"
       ></iframe>
     </div>
   </foreignObject>
   
-  <!-- Script to load iframe dynamically -->
+  <!-- Script to monitor iframe loading -->
   <script type="text/javascript">
     <![CDATA[
       console.clear();
       console.log('═══════════════════════════════════════');
-      console.log('🔍 SVG WITH IFRAME TEST');
+      console.log('🔍 SVG WITH IFRAME TO ai.planet.com');
       console.log('═══════════════════════════════════════');
       
       console.log('✅ SVG loaded successfully');
-      console.log('📍 Attempting to load iframe to: https://ai.planet.com');
+      console.log('📍 Attempting to load iframe to: https://ai.planet.com/');
       
-      // Wait for DOM to be ready
-      window.addEventListener('load', function() {
-        console.log('📌 Window load event fired');
-        
-        // Method 1: Using foreignObject (recommended for SVG)
-        try {
-          var fo = document.querySelector('foreignObject');
-          if (fo) {
-            console.log('  ✅ foreignObject found');
-            var div = fo.querySelector('div');
-            if (div) {
-              console.log('  ✅ div container found');
-              var iframe = div.querySelector('iframe');
-              if (iframe) {
-                console.log('  ✅ iframe element found');
-                console.log('  📍 iframe src:', iframe.src);
+      // Track iframe loading status
+      var iframeLoaded = false;
+      
+      // Function to check iframe status
+      function checkIframe() {
+        var fo = document.querySelector('foreignObject');
+        if (fo) {
+          var div = fo.querySelector('div');
+          if (div) {
+            var iframe = div.querySelector('iframe');
+            if (iframe) {
+              console.log('  ✅ iframe element found');
+              console.log('  📍 iframe src:', iframe.src);
+              console.log('  📍 iframe sandbox:', iframe.sandbox.value || 'none');
+              
+              // Add load event listener if not already added
+              if (!iframe._listenerAdded) {
+                iframe._listenerAdded = true;
                 
-                // Add load event listener
                 iframe.onload = function() {
+                  iframeLoaded = true;
                   console.log('  ✅ IFRAME LOADED SUCCESSFULLY!');
                   console.log('  📍 iframe URL:', iframe.src);
+                  console.log('  📍 iframe readyState:', iframe.contentDocument ? iframe.contentDocument.readyState : 'N/A');
                   
                   try {
-                    console.log('  📍 iframe contentWindow:', iframe.contentWindow);
                     if (iframe.contentWindow) {
+                      console.log('  📍 iframe contentWindow available');
                       console.log('  📍 contentWindow.location:', iframe.contentWindow.location.href);
+                      console.log('  📍 contentWindow.origin:', iframe.contentWindow.origin || 'N/A');
                     }
                   } catch(e) {
                     console.warn('  ⚠️ Cannot access contentWindow (CORS):', e.message);
@@ -66,54 +71,48 @@
               }
             }
           }
-        } catch(e) {
-          console.error('  ❌ ForeignObject method failed:', e.message);
         }
+      }
+      
+      // Check immediately and after delay
+      checkIframe();
+      
+      // Also check after window loads
+      window.addEventListener('load', function() {
+        console.log('\n📌 Window load event fired');
+        checkIframe();
         
-        // Method 2: Alternative - create iframe dynamically (using createElementNS for SVG)
-        try {
-          // Create foreignObject dynamically
-          var newFo = document.createElementNS('http://www.w3.org/2000/svg', 'foreignObject');
-          newFo.setAttribute('x', '20');
-          newFo.setAttribute('y', '60');
-          newFo.setAttribute('width', '760');
-          newFo.setAttribute('height', '520');
-          
-          var newDiv = document.createElement('div');
-          newDiv.setAttribute('xmlns', 'http://www.w3.org/1999/xhtml');
-          newDiv.style.width = '100%';
-          newDiv.style.height = '100%';
-          
-          var newIframe = document.createElement('iframe');
-          newIframe.src = 'https://ai.planet.com';
-          newIframe.style.width = '100%';
-          newIframe.style.height = '100%';
-          newIframe.style.border = '1px solid #ccc';
-          newIframe.style.borderRadius = '5px';
-          newIframe.setAttribute('sandbox', 'allow-scripts allow-same-origin allow-forms');
-          
-          newDiv.appendChild(newIframe);
-          newFo.appendChild(newDiv);
-          document.documentElement.appendChild(newFo);
-          
-          console.log('  ✅ Dynamically created iframe (alternative method)');
-          console.log('  📍 New iframe src:', newIframe.src);
-          
-          newIframe.onload = function() {
-            console.log('  ✅ DYNAMIC IFRAME LOADED!');
-          };
-          
-        } catch(e) {
-          console.error('  ❌ Dynamic creation failed:', e.message);
-        }
-        
-        console.log('\n⏱️ Test completed at:', new Date().toISOString());
-        console.log('═══════════════════════════════════════');
+        // Check iframe content after load
+        setTimeout(function() {
+          var fo = document.querySelector('foreignObject');
+          if (fo) {
+            var div = fo.querySelector('div');
+            if (div) {
+              var iframe = div.querySelector('iframe');
+              if (iframe) {
+                console.log('\n📌 Final status check:');
+                console.log('  📍 iframe.src:', iframe.src);
+                console.log('  📍 iframe.complete:', iframe.complete || 'N/A');
+                console.log('  📍 iframe readyState:', iframe.contentDocument ? iframe.contentDocument.readyState : 'N/A');
+                console.log('  📍 iframe loaded:', iframeLoaded ? '✅ YES' : '⏳ Still loading or error');
+                
+                // Check if content loaded
+                try {
+                  if (iframe.contentDocument && iframe.contentDocument.body) {
+                    console.log('  📍 Content loaded! Title:', iframe.contentDocument.title || 'No title');
+                    console.log('  📍 Body length:', iframe.contentDocument.body.innerHTML.length || 0);
+                  }
+                } catch(e) {
+                  console.warn('  ⚠️ Cannot access contentDocument (CORS):', e.message);
+                }
+              }
+            }
+          }
+        }, 3000);
       });
       
-      // Initial log
-      console.log('📌 Script execution started');
-      console.log('📍 SVG readyState:', document.readyState);
+      console.log('\n⏱️ Test running...');
+      console.log('═══════════════════════════════════════');
     ]]>
   </script>
 </svg>
