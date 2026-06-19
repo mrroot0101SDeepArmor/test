@@ -1,89 +1,46 @@
-<svg xmlns="http://www.w3.org/2000/svg" onload="
-  console.clear();
-  console.log('═══════════════════════════════════════');
-  console.log('🔍 SVG IFRAME TEST');
-  console.log('═══════════════════════════════════════');
+<svg xmlns="http://www.w3.org/2000/svg" width="400" height="200">
+  <!-- Visual element to confirm SVG loaded -->
+  <polygon points="50,15 90,85 10,85" fill="#4CAF50" stroke="#2E7D32" stroke-width="32"/>
   
-  var timestamp = new Date().toISOString();
-  console.log('⏱️ Test started:', timestamp);
-  console.log('📍 Current origin:', window.location.origin);
-  console.log('📍 Current URL:', window.location.href);
-  
-  // Test 1: Element creation
-  console.log('\n📌 Test 1: Creating iframe element');
-  try {
-    var iframe = document.createElement('iframe');
-    console.log('  ✅ iframe created:', iframe.tagName);
-    console.log('  📦 iframe object:', iframe);
-    
-    // Test 2: Setting properties
-    console.log('\n📌 Test 2: Setting iframe properties');
-    iframe.src = 'about:blank';
-    console.log('  ✅ src set to: about:blank');
-    
-    iframe.style.display = 'none';
-    console.log('  ✅ display set to: none');
-    
-    iframe.style.width = '0';
-    iframe.style.height = '0';
-    console.log('  ✅ dimensions set to 0');
-    
-    // Test 3: Adding to DOM
-    console.log('\n📌 Test 3: Appending to DOM');
-    document.body.appendChild(iframe);
-    console.log('  ✅ iframe appended to body');
-    console.log('  📍 iframe parent:', iframe.parentNode.tagName);
-    console.log('  📍 iframe in DOM:', document.body.contains(iframe));
-    
-    // Test 4: Check if iframe loaded
-    console.log('\n📌 Test 4: Waiting for iframe load');
-    iframe.onload = function() {
-      console.log('  ✅ IFRAME LOADED SUCCESSFULLY!');
-      console.log('  📍 iframe URL:', iframe.src);
+  <!-- This script runs when the SVG loads -->
+  <script type="text/javascript">
+    <![CDATA[
+      console.clear();
+      console.log('═══════════════════════════════════════');
+      console.log('🔍 SVG TEST SUCCESSFUL!');
+      console.log('═══════════════════════════════════════');
+      console.log('✅ SVG loaded and script executed');
+      console.log('📍 SVG namespace:', document.documentElement.namespaceURI);
+      console.log('📍 SVG root:', document.documentElement.tagName);
+      console.log('📍 Number of elements:', document.querySelectorAll('*').length);
+      console.log('📍 Polygon exists:', !!document.querySelector('polygon'));
       
-      try {
-        console.log('  📍 iframe contentWindow:', iframe.contentWindow);
-        if (iframe.contentWindow) {
-          console.log('  📍 contentWindow.location:', iframe.contentWindow.location.href);
-        }
-      } catch(e) {
-        console.warn('  ⚠️ Cannot access contentWindow (CORS):', e.message);
-      }
-    };
-    
-    // Test 5: Check iframe readyState
-    console.log('\n📌 Test 5: Checking iframe state');
-    setTimeout(function() {
-      console.log('  ⏱️ After 1 second:');
-      console.log('  📍 iframe.src:', iframe.src);
-      console.log('  📍 iframe.contentDocument:', iframe.contentDocument);
+      // Show what DOES work in SVG context
+      console.log('\n📌 What works in SVG:');
+      console.log('  ✅ console.log() works');
+      console.log('  ✅ DOM queries work (document.querySelector)');
+      console.log('  ✅ Element creation works (createElementNS)');
       
+      // Create SVG element (not HTML iframe)
       try {
-        var doc = iframe.contentDocument || iframe.contentWindow?.document;
-        if (doc) {
-          console.log('  📍 readyState:', doc.readyState);
-          console.log('  📍 title:', doc.title);
-          console.log('  📍 body:', doc.body);
-        }
+        var circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+        circle.setAttribute('cx', '200');
+        circle.setAttribute('cy', '100');
+        circle.setAttribute('r', '30');
+        circle.setAttribute('fill', 'orange');
+        document.documentElement.appendChild(circle);
+        console.log('  ✅ Created new circle element dynamically');
       } catch(e) {
-        console.warn('  ⚠️ Cannot access contentDocument (CORS):', e.message);
+        console.error('  ❌ Element creation failed:', e.message);
       }
-    }, 1000);
-    
-    // Test 6: Error handling
-    console.log('\n📌 Test 6: Setting up error handlers');
-    iframe.onerror = function(e) {
-      console.error('  ❌ iframe error:', e);
-    };
-    
-    console.log('\n✅ All tests completed');
-    console.log('═══════════════════════════════════════');
-    
-  } catch(e) {
-    console.error('\n❌ FATAL ERROR:', e.message);
-    console.error('Stack trace:', e.stack);
-    console.log('═══════════════════════════════════════');
-  }
-">
-  <polygon points="50,15 90,85 10,85" fill="#4CAF50" stroke="#2E7D32" stroke-width="3"/>
+      
+      console.log('\n❌ What does NOT work in SVG:');
+      console.log('  ❌ document.body (null in SVG)');
+      console.log('  ❌ document.createElement (use createElementNS instead)');
+      console.log('  ❌ Appending HTML elements (only SVG elements)');
+      
+      console.log('\n⏱️ Test completed at:', new Date().toISOString());
+      console.log('═══════════════════════════════════════');
+    ]]>
+  </script>
 </svg>
