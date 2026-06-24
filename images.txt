@@ -1,6 +1,6 @@
 Rules
 -----
-Please make sure not to edit the logo image since it a will be copyright issue if edited. If the svg is not present we will add the svg later. Make sure to use same tag as image extention cause using inline img tag gave error last time. Better use svg than using something other and get issues later. 
+Please make sure not to edit the logo image since it a will be copyright issue if edited. If the svg is not present we will add the svg later. Make sure to use same tag as image extention cause using inline img tag gave error last time. Better use svg than using something other and get issues later. Please do not use object tag also. Make some logic to fetch the svg and put it directly as it is. The Rules are very strict.
 
 
 Requirements
