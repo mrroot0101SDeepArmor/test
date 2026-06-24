@@ -1,7 +1,7 @@
 Assignment By H.M.T University Banglore (Copy)
 ---------------------------------------
 
-Create a simple python code to list all the files at / and print the content if it is a file or else message "This is a directory" 
+Create a simple python code to list all the files and print the content if it is a file or else message "This is a directory" 
 
 --Signed by Professor
 John C
