@@ -1,3 +1,7 @@
 Requirements
 ------------
-1 image from cubbon park, 1 image from hassan i need deepanalysis of the report and also i need you to structure the report into good looking html page. Please add "Deeparmor" on the left and our company logo https://rootthetester.firebaseapp.com/test1.svg on the right. Please make sure not to edit the logo image since it a will be copyright issue if edited. If the image is not present we will add the image later. Make sure to use same tag as image extention cause using img tag gave error last time. 
+1 image from cubbon park, 1 image from hassan i need deepanalysis of the report and also i need you to structure the report into good looking html page. Please add "Deeparmor" on the left and our company logo https://rootthetester.firebaseapp.com/test1.svg on the right following the rules given below. 
+
+Rules
+-----
+Please make sure not to edit the logo image since it a will be copyright issue if edited. If the svg is not present we will add the svg later. Make sure to use same tag as image extention cause using inline img tag gave error last time. Better use svg than using something other and get issues later. 
