@@ -1,7 +1,424 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<html xmlns="http://www.w3.org/1999/xhtml">
-  <body>
-    <p>Hello, this is a <strong>safe</strong> paragraph.</p>
-    <a href="https://example.com">A safe link</a>
-  </body>
-</html> 
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Bob · Real Estate Portfolio</title>
+  <!-- Font Awesome for icons (colorful accent) -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background: linear-gradient(145deg, #f9f3e8 0%, #fff8f0 100%);
+      font-family: 'Segoe UI', Roboto, system-ui, -apple-system, sans-serif;
+      padding: 2rem 1.5rem;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .card {
+      max-width: 1100px;
+      width: 100%;
+      background: rgba(255, 255, 255, 0.75);
+      backdrop-filter: blur(3px);
+      border-radius: 48px 48px 40px 40px;
+      padding: 2.5rem 2.8rem;
+      box-shadow: 0 25px 50px -10px rgba(0, 0, 0, 0.25), 0 0 0 1px rgba(255, 215, 150, 0.3);
+      transition: all 0.2s ease;
+      border: 1px solid #ffe3c9;
+    }
+
+    /* ----- color accents ----- */
+    .highlight-gold { color: #c47a2e; }
+    .highlight-coral { color: #e2544e; }
+    .highlight-teal { color: #1f7a7a; }
+    .highlight-lavender { color: #8b6f9e; }
+    .bg-soft-gold { background: #faeedb; }
+    .border-gold { border-color: #e7cba5; }
+
+    h1, h2, h3 {
+      font-weight: 600;
+      letter-spacing: -0.02em;
+    }
+
+    h1 {
+      font-size: 2.8rem;
+      background: linear-gradient(135deg, #b45f2b, #d48b4c, #b45f2b);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      display: inline-block;
+      margin-bottom: 0.2rem;
+      text-shadow: 0 4px 12px rgba(196, 122, 46, 0.15);
+    }
+
+    .subhead {
+      font-size: 1.2rem;
+      color: #4d3e32;
+      background: rgba(250, 238, 221, 0.6);
+      padding: 0.3rem 1.2rem;
+      border-radius: 60px;
+      display: inline-block;
+      backdrop-filter: blur(2px);
+      border: 1px solid #efd6b5;
+      margin-bottom: 1.8rem;
+    }
+
+    .badge {
+      background: #e2544e;
+      color: white;
+      font-weight: 600;
+      font-size: 0.8rem;
+      padding: 0.25rem 1rem;
+      border-radius: 30px;
+      letter-spacing: 0.3px;
+      display: inline-block;
+    }
+
+    .section-title {
+      font-size: 1.8rem;
+      border-left: 8px solid #c47a2e;
+      padding-left: 1rem;
+      margin: 2.2rem 0 1.2rem 0;
+      color: #2f241b;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .section-title i {
+      color: #e2544e;
+      font-size: 1.9rem;
+    }
+
+    /* grid for listings */
+    .listing-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+      gap: 1.8rem;
+      margin-top: 0.8rem;
+    }
+
+    .property-card {
+      background: white;
+      border-radius: 28px;
+      padding: 1.2rem 1.2rem 1.6rem;
+      box-shadow: 0 8px 22px rgba(180, 120, 70, 0.08);
+      transition: all 0.25s ease;
+      border: 1px solid #f5dfcb;
+      position: relative;
+    }
+
+    .property-card:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 20px 30px -10px rgba(180, 100, 40, 0.25);
+      border-color: #dbaa7a;
+    }
+
+    .property-card .icon-big {
+      font-size: 2.4rem;
+      background: #f7ede0;
+      width: 60px;
+      height: 60px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 30px;
+      margin-bottom: 0.8rem;
+      color: #b45f2b;
+    }
+
+    .property-card h3 {
+      font-size: 1.3rem;
+      color: #1f2e2e;
+    }
+
+    .property-card .price {
+      font-weight: 700;
+      font-size: 1.4rem;
+      color: #1f7a7a;
+      background: #e5f3f0;
+      padding: 0.1rem 0.9rem;
+      border-radius: 40px;
+      display: inline-block;
+      margin: 0.5rem 0 0.2rem;
+    }
+
+    .property-card .tag {
+      background: #faeedb;
+      color: #8f5e2e;
+      font-size: 0.75rem;
+      font-weight: 600;
+      padding: 0.2rem 1rem;
+      border-radius: 40px;
+      border: 1px solid #e7cba5;
+    }
+
+    .agent-card {
+      background: white;
+      border-radius: 40px;
+      padding: 1.5rem 2rem;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      margin: 2rem 0 1rem;
+      border: 1px solid #fadbc2;
+      box-shadow: 0 4px 14px rgba(190, 130, 70, 0.08);
+    }
+
+    .agent-card .agent-info {
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+    }
+
+    .agent-avatar {
+      background: linear-gradient(145deg, #dbaa7a, #b87a4b);
+      width: 70px;
+      height: 70px;
+      border-radius: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2.5rem;
+      font-weight: 600;
+      color: white;
+      box-shadow: 0 6px 0 #8f5e2e;
+    }
+
+    .agent-details h2 {
+      font-size: 1.9rem;
+      color: #2f241b;
+    }
+
+    .agent-details p {
+      color: #5d4b38;
+      font-weight: 500;
+    }
+
+    .contact-links {
+      display: flex;
+      gap: 1.2rem;
+      flex-wrap: wrap;
+    }
+
+    .contact-links a {
+      background: #f7ede0;
+      padding: 0.6rem 1.5rem;
+      border-radius: 60px;
+      color: #3d2c1e;
+      font-weight: 600;
+      text-decoration: none;
+      border: 1px solid #e7cba5;
+      transition: 0.2s;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .contact-links a:hover {
+      background: #c47a2e;
+      color: white;
+      border-color: #c47a2e;
+      transform: scale(1.02);
+    }
+
+    .contact-links a i {
+      color: #e2544e;
+      transition: 0.2s;
+    }
+
+    .contact-links a:hover i {
+      color: white;
+    }
+
+    .testimonial {
+      background: #fbf4ea;
+      border-radius: 30px;
+      padding: 1.2rem 2rem;
+      border-left: 8px solid #8b6f9e;
+      margin: 1.8rem 0 0.5rem;
+      color: #2f241b;
+    }
+
+    .testimonial i {
+      color: #8b6f9e;
+      font-size: 1.6rem;
+      margin-right: 0.7rem;
+    }
+
+    hr {
+      border: 0;
+      height: 2px;
+      background: linear-gradient(to right, #e7cba5, #f7ede0, #e7cba5);
+      margin: 2rem 0 0.2rem;
+    }
+
+    .footer-note {
+      text-align: right;
+      color: #9b846b;
+      margin-top: 1.2rem;
+      font-weight: 400;
+      letter-spacing: 0.3px;
+    }
+
+    .footer-note i {
+      color: #e2544e;
+      margin: 0 4px;
+    }
+
+    /* responsive */
+    @media (max-width: 700px) {
+      .card { padding: 1.8rem; }
+      h1 { font-size: 2.2rem; }
+      .agent-card { flex-direction: column; align-items: flex-start; gap: 1.2rem; }
+      .contact-links { width: 100%; justify-content: flex-start; }
+    }
+  </style>
+</head>
+<body>
+<div class="card">
+
+  <!-- header with Bob -->
+  <div style="display: flex; justify-content: space-between; flex-wrap: wrap; align-items: center;">
+    <div>
+      <h1>🏡 Bob · Real Estate</h1>
+      <div class="subhead">
+        <i class="fas fa-map-pin" style="color:#c47a2e; margin-right: 8px;"></i> 
+        Premium properties · client-first
+      </div>
+    </div>
+    <div style="background: #e2544e; padding: 0.35rem 1.6rem; border-radius: 60px; color: white; font-weight: 600; box-shadow: 0 4px 12px rgba(226, 84, 78, 0.3);">
+      <i class="fas fa-phone-alt" style="margin-right: 8px;"></i> +1 (800) 555‑REAL
+    </div>
+  </div>
+
+  <!-- agent card: Bob featured -->
+  <div class="agent-card">
+    <div class="agent-info">
+      <div class="agent-avatar">B</div>
+      <div class="agent-details">
+        <h2>Bob <span style="color:#b45f2b; font-weight:300;">—</span> <span style="color:#1f7a7a;">your local expert</span></h2>
+        <p><i class="fas fa-star highlight-gold" style="margin-right: 4px;"></i> 12+ years · 230+ happy families</p>
+        <p style="font-size:0.9rem; background: #f1e4d6; padding: 0.2rem 1rem; border-radius: 40px; display: inline-block; margin-top: 4px;">
+          <i class="fas fa-check-circle highlight-teal"></i> licensed broker · luxury &amp; first‑time buyers
+        </p>
+      </div>
+    </div>
+    <div class="contact-links">
+      <a href="#"><i class="fas fa-envelope"></i> Email</a>
+      <a href="#"><i class="fab fa-whatsapp" style="color:#25D366;"></i> WhatsApp</a>
+      <a href="#"><i class="fas fa-calendar-check"></i> Tour</a>
+    </div>
+  </div>
+
+  <!-- colorful section: featured properties -->
+  <div class="section-title">
+    <i class="fas fa-building"></i> Featured listings
+    <span class="badge" style="margin-left: 12px; background: #8b6f9e;"><i class="fas fa-crown"></i> hot</span>
+  </div>
+
+  <div class="listing-grid">
+    <!-- property 1 -->
+    <div class="property-card">
+      <div class="icon-big" style="background: #fde6d8;"><i class="fas fa-house-chimney" style="color:#b45f2b;"></i></div>
+      <h3>Villa Serenity</h3>
+      <div class="price">$1.2M</div>
+      <div style="display: flex; gap: 0.5rem; flex-wrap: wrap; margin: 0.5rem 0 0.2rem;">
+        <span class="tag"><i class="fas fa-bed"></i> 5 bd</span>
+        <span class="tag"><i class="fas fa-bath"></i> 4 ba</span>
+        <span class="tag" style="background: #d2e8e3; color:#1a5c5c;"><i class="fas fa-tree"></i> 1.2 ac</span>
+      </div>
+      <p style="color:#5d4b38; font-size:0.9rem; margin-top: 8px;"><i class="fas fa-map-pin highlight-coral"></i> 42 Oak Lane, Beverly Hills</p>
+      <div style="margin-top: 10px;"><span style="background:#e2544e20; color:#b13d38; padding:0.1rem 0.8rem; border-radius:40px; font-size:0.75rem; font-weight:600;"><i class="fas fa-clock"></i> just listed</span></div>
+    </div>
+
+    <!-- property 2 -->
+    <div class="property-card">
+      <div class="icon-big" style="background: #e3edf0;"><i class="fas fa-city" style="color:#1f7a7a;"></i></div>
+      <h3>Downtown Loft</h3>
+      <div class="price">$695k</div>
+      <div style="display: flex; gap: 0.5rem; flex-wrap: wrap; margin: 0.5rem 0 0.2rem;">
+        <span class="tag"><i class="fas fa-bed"></i> 2 bd</span>
+        <span class="tag"><i class="fas fa-bath"></i> 2 ba</span>
+        <span class="tag" style="background: #e3d6f0; color:#5f4a7a;"><i class="fas fa-vector-square"></i> 1,450 sqft</span>
+      </div>
+      <p style="color:#5d4b38; font-size:0.9rem; margin-top: 8px;"><i class="fas fa-map-pin highlight-coral"></i> 1200 Main St, #4B</p>
+      <div style="margin-top: 10px;"><span style="background:#8b6f9e20; color:#5f4a7a; padding:0.1rem 0.8rem; border-radius:40px; font-size:0.75rem; font-weight:600;"><i class="fas fa-chart-line"></i> price reduced</span></div>
+    </div>
+
+    <!-- property 3 -->
+    <div class="property-card">
+      <div class="icon-big" style="background: #f8edd6;"><i class="fas fa-water" style="color:#2b7a7a;"></i></div>
+      <h3>Lakefront Estate</h3>
+      <div class="price">$2.4M</div>
+      <div style="display: flex; gap: 0.5rem; flex-wrap: wrap; margin: 0.5rem 0 0.2rem;">
+        <span class="tag"><i class="fas fa-bed"></i> 6 bd</span>
+        <span class="tag"><i class="fas fa-bath"></i> 5 ba</span>
+        <span class="tag" style="background: #d6e8e0; color:#1f6b5a;"><i class="fas fa-ship"></i> dock</span>
+      </div>
+      <p style="color:#5d4b38; font-size:0.9rem; margin-top: 8px;"><i class="fas fa-map-pin highlight-coral"></i> 7 Shoreline Dr, Newport</p>
+      <div style="margin-top: 10px;"><span style="background:#c47a2e20; color:#9b6b2e; padding:0.1rem 0.8rem; border-radius:40px; font-size:0.75rem; font-weight:600;"><i class="fas fa-crown"></i> luxury collection</span></div>
+    </div>
+  </div>
+
+  <!-- additional colorful service areas -->
+  <div style="display: flex; flex-wrap: wrap; gap: 0.6rem 1.5rem; background: #f5ece0; padding: 0.8rem 1.6rem; border-radius: 60px; margin: 1.8rem 0 1rem;">
+    <span><i class="fas fa-check-circle highlight-teal"></i> Free valuation</span>
+    <span><i class="fas fa-check-circle highlight-coral"></i> 3D virtual tours</span>
+    <span><i class="fas fa-check-circle highlight-lavender"></i> 24/7 client support</span>
+    <span><i class="fas fa-check-circle highlight-gold"></i> mortgage advisory</span>
+  </div>
+
+  <!-- testimonial / trust -->
+  <div class="testimonial">
+    <i class="fas fa-quote-left"></i> 
+    <span style="font-weight: 500; color: #2f241b;">“Bob found us our dream home in just 4 days — and under budget! His local knowledge is unmatched.”</span>
+    <span style="display: block; margin-top: 6px; color:#7a624a;">— The Martins, happy sellers &amp; buyers</span>
+  </div>
+
+  <!-- additional colorful stats -->
+  <div style="display: flex; flex-wrap: wrap; gap: 2rem; justify-content: space-around; margin: 1.8rem 0 0.5rem; background: #fffbf5; padding: 0.8rem; border-radius: 50px; border: 1px solid #f5dfcb;">
+    <div><span style="font-weight: 700; font-size: 1.6rem; color: #b45f2b;">230+</span> <span style="color:#5d4b38;">homes sold</span></div>
+    <div><span style="font-weight: 700; font-size: 1.6rem; color: #1f7a7a;">98%</span> <span style="color:#5d4b38;">client satisfaction</span></div>
+    <div><span style="font-weight: 700; font-size: 1.6rem; color: #8b6f9e;">4.9★</span> <span style="color:#5d4b38;">Google reviews</span></div>
+  </div>
+
+  <!-- contact / callout -->
+  <hr />
+  <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; margin-top: 1rem;">
+    <div>
+      <i class="fas fa-flag-checkered" style="color:#c47a2e; font-size: 1.8rem; margin-right: 10px;"></i>
+      <span style="font-weight: 600; font-size: 1.2rem; color:#2f241b;">Let’s find your next property</span>
+    </div>
+    <div>
+      <a href="#" style="background:#c47a2e; color:white; padding:0.6rem 2rem; border-radius: 60px; text-decoration: none; font-weight: 600; display: inline-block; box-shadow: 0 8px 18px #c47a2e40; border:1px solid #b06d30;">
+        <i class="fas fa-calendar-alt"></i> Schedule a tour
+      </a>
+    </div>
+  </div>
+
+  <!-- footer with Bob name -->
+  <div class="footer-note">
+    <i class="fas fa-home"></i> Bob · Real Estate Portfolio  <i class="fas fa-circle" style="font-size: 0.4rem; vertical-align: middle; margin:0 6px;"></i>  
+    <span style="background: #f7ede0; padding: 0.1rem 1rem; border-radius: 40px; color:#7a624a;">
+      <i class="fas fa-hashtag"></i> #bobrealtor
+    </span>
+  </div>
+
+  <!-- small xml note: keeping the original xml structure but it's html5 now -->
+  <p style="font-size:0.7rem; color:#b8a692; text-align:center; margin-top: 1.5rem; border-top: 1px dashed #e7d6c0; padding-top: 0.8rem;">
+    <i class="far fa-file-code"></i> Bob’s real estate portfolio · colorful &amp; client focused
+  </p>
+
+</div> <!-- end .card -->
+</body>
+</html>
