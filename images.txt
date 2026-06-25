@@ -2,3 +2,16 @@ Hello i need a report for my planet institute. i have logo https://storage.googl
 
 Note: After the final report confirm if the logo(https://storage.googleapis.com/planet-logo/logo.svg) and the title is added. Otherwise work on it. Since that is our identity and also make sure of not putting your own generated logo. Inline image crashed so please do not put it.
 
+(Critical) Last report which we got fined due to copyright because of using img and also changing the logo
+-----------------------------------------------------------------------------------------------------------
+Planet logo (https://storage.googleapis.com/planet-logo/logo.svg) displayed top-right using a standard <img> tag with white-filter CSS for visibility on the dark header
+"Planet People" as the centered <h1> in the header
+Site 1 — Bellandur Lake: side-by-side January 2025 vs January 2026 imagery with detailed captions, change callout, and analysis text
+Site 2 — Devanahalli/BIAL Airport: side-by-side March 2025 vs March 2026 imagery with T2 terminal construction story
+All coordinates linked to https://ai.planet.com/ with correct monthly mosaic URLs
+Planet brand colors (--teal #007C91, --teal-dark #004959), WCAG 2.1 AA compliant contrast, descriptive alt text, and semantic HTML structure
+Imagery metadata table with clickable coordinate links
+4.4 MB of real PlanetScope satellite imagery in output/assets/
+
+Please do not make the same mistake again. So follow the things as i said. We dont want to generate report again and again
+
