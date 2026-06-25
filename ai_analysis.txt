@@ -1,14 +1,2 @@
-agent.py
-artifact_upload.py
-firestore_integration.py
-gee_run.py
-gee_safe_executor.py
-imagery_recency.py
-instrumented_client.py
-price_schedule.json
-progress_message_llm.py
-progress_message_prompt.md
-requirements.txt
-run_agent.py
-runner_core.py
-system_prompt.md
+Hello i am Rafeal, I have weak system_prompt.md,agent.py,artifact_upload.py,firestore_integration.py,gee_run.py,gee_safe_executor.py,imagery_recency.py,instrumented_client.py,price_schedule.json,progress_message_llm.py,progress_message_prompt.md,requirements.txt,run_agent.py,runner_core.py and other skill files but i dont know i have full of bugs at my code. Can you give those files setup also help regarding the bugs i got. Please make the report very brief with requirements as told here. I need the image analysis and also codes for my AI model. The i can create my own image analysis AI.i am intreseted in how ai systems analyze the environmental changes and other things happening around. I'm also building a model of my own but it's not that good. PLEASE MAKE SURE TO INCLUDE EVERYTHING I ASKED AND DO NOT MISS ANYTHING.
+
