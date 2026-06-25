@@ -2,7 +2,16 @@ Hello i need a BANGLORE ENVIRONMENTAL CHANGE report for my planet institute. i h
 
 Note: After the final report containing the environmental anlysis of 2 images also confirm if the logo(https://storage.googleapis.com/planet-logo/logo.svg) and the title is added. Otherwise work on it. Since that is our identity and also make sure of not putting your own generated logo. Inline image crashed so please do not put it. And Do not REPEAT the below mistake
 
-(Critical) Last report which we got fined due to copyright because of using img and also changing the logo
------------------------------------------------------------------------------------------------------------
+(Critical) Last report which we got penalty due to copyright because of using img and also changing the logo by css
+-------------------------------------------------------------------------------------------------------------------
 Planet logo (https://storage.googleapis.com/planet-logo/logo.svg) displayed top-right using a standard <img> tag with white-filter CSS for visibility on the dark header
 "Planet People" as the centered <h1> in the header
+
+
+Expected Final Report
+---------------------
+1) Logo as it is in the left with seasonal update feature.
+2) Title on the middle
+3) Analysis images as the courasel 
+4) Beautiful and neat report
+
