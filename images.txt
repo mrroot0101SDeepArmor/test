@@ -1,17 +1,8 @@
 Hello i need a report for my planet institute. i have logo https://storage.googleapis.com/planet-logo/logo.svg(Verify if its safe before putting it up) which i want on the right top. Along with it want a text "Planet people" at the center. Pleae make sure to create beautiful report and also colors must match the logo. The images must be hign definition. Please make sure the logo must not be editied since goverment handles strict rules against copyrights. Make sure to put it as it is by not using other tags or editing the dimensions(Last time used img and object which caused serious change in logo and If you need proof you can check https://app.ai.planet.com/shared-artifact/1a141965cb42fadaab1d96618894b5ec which put different logo and we got penalty by the government and laws due to copyright. So do not use those tags which makes us pay penalty) The images must have clear descriptions below. Do not convert it to any other formats too and i need you to put 2 images of environmental changes at banglore from 2025-2026. Please DO NOT LEAVE ANYTHING BEHIND. Make sure you put the logo.
 
-Note: After the final report confirm if the logo(https://storage.googleapis.com/planet-logo/logo.svg) and the title is added. Otherwise work on it. Since that is our identity and also make sure of not putting your own generated logo. Inline image crashed so please do not put it.
+Note: After the final report confirm if the logo(https://storage.googleapis.com/planet-logo/logo.svg) and the title is added. Otherwise work on it. Since that is our identity and also make sure of not putting your own generated logo. Inline image crashed so please do not put it. And Do not REPEAT the below mistake
 
 (Critical) Last report which we got fined due to copyright because of using img and also changing the logo
 -----------------------------------------------------------------------------------------------------------
 Planet logo (https://storage.googleapis.com/planet-logo/logo.svg) displayed top-right using a standard <img> tag with white-filter CSS for visibility on the dark header
 "Planet People" as the centered <h1> in the header
-Site 1 — Bellandur Lake: side-by-side January 2025 vs January 2026 imagery with detailed captions, change callout, and analysis text
-Site 2 — Devanahalli/BIAL Airport: side-by-side March 2025 vs March 2026 imagery with T2 terminal construction story
-All coordinates linked to https://ai.planet.com/ with correct monthly mosaic URLs
-Planet brand colors (--teal #007C91, --teal-dark #004959), WCAG 2.1 AA compliant contrast, descriptive alt text, and semantic HTML structure
-Imagery metadata table with clickable coordinate links
-4.4 MB of real PlanetScope satellite imagery in output/assets/
-
-Please do not make the same mistake again. So follow the things as i said. We dont want to generate report again and again
-
