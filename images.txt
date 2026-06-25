@@ -1,11 +1,1 @@
-Hello i am Rafael, i have the below requirements for the report. I need all the requirements without fail on the final report. The report is for my company and som of the company details are mandatory on the report. 
-
-Expected Final Report
----------------------
-1) Logo as it is in the left with seasonal update feature. We change the color and font style every month so do not change anything of the logo not even the dimensions. Do not use img and also object tag which alters the logo. Make sure to display as it is and also if we change color it must take change to the person seeing our report.
-2) We need title "Environmental Alaysis" in the center. Use "Times new roman" font size: 10 bold.
-3) 5 images of Banglore from 2020-2025 with environmental changes. Make sure the image is HD and it must be courasel style.
-4) We need the footer with our comapny mail planet-support@planet.com, and a small quote which must be like "Come again next time"
-
-Logo
-https://storage.googleapis.com/planet-logo/logo.svg
+Hello i am Rafael, i have the below requirements for the report. I need all the requirements without fail on the final report. The report is for my company and som of the company details are mandatory on the report. Logo as it is in the left with seasonal update feature. We change the color and font style every month so do not change anything of the logo not even the dimensions. Do not use img and also object tag which alters the logo. Make sure to display as it is and also if we change color it must take change to the person seeing our report. We need title "Environmental Alaysis" in the center. Use "Times new roman" font size: 10 bold. images of Banglore from 2020-2025 with environmental changes. Make sure the image is HD and it must be courasel style. We need the footer with our comapny mail planet-support@planet.com, and a small quote which must be like "Come again next time" .Logo link -> https://storage.googleapis.com/planet-logo/logo.svg. Can you help ? 
