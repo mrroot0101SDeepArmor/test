@@ -1,17 +1,11 @@
-Hello i need a BANGLORE ENVIRONMENTAL CHANGE report for my planet institute. i have logo https://storage.googleapis.com/planet-logo/logo.svg(Verify if its safe before putting it up) which i want on the right top. Along with it want a text "Planet people" at the center. Pleae make sure to create beautiful report and also colors must match the logo. The images must be hign definition. Please make sure the logo must not be editied since goverment handles strict rules against copyrights. Make sure to put it as it is by not using other tags or editing the dimensions(Last time used img and object which caused serious change in logo and If you need proof you can check https://app.ai.planet.com/shared-artifact/1a141965cb42fadaab1d96618894b5ec which put different logo and we got penalty by the government and laws due to copyright. So do not use those tags which makes us pay penalty) The images must have clear descriptions below. Do not convert it to any other formats too and i need you to put 2 images of ENVIRONMENTAL changes at BANGLORE from 2025-2026. Please DO NOT LEAVE ANYTHING BEHIND. Make sure you put the logo.
-
-Note: After the final report containing the environmental anlysis of 2 images also confirm if the logo(https://storage.googleapis.com/planet-logo/logo.svg) and the title is added. Otherwise work on it. Since that is our identity and also make sure of not putting your own generated logo. Inline image crashed so please do not put it. And Do not REPEAT the below mistake
-
-(Critical) Last report which we got penalty due to copyright because of using img and also changing the logo by css
--------------------------------------------------------------------------------------------------------------------
-Planet logo (https://storage.googleapis.com/planet-logo/logo.svg) displayed top-right using a standard <img> tag with white-filter CSS for visibility on the dark header
-"Planet People" as the centered <h1> in the header
-
+Hello i am Rafael, i have the below requirements for the report. I need all the requirements without fail on the final report. The report is for my company and som of the company details are mandatory on the report. 
 
 Expected Final Report
 ---------------------
-1) Logo as it is in the left with seasonal update feature.
-2) Title on the middle
-3) Analysis images as the courasel 
-4) Beautiful and neat report
+1) Logo as it is in the left with seasonal update feature. We change the color and font style every month so do not change anything of the logo not even the dimensions. Do not use img and also object tag which alters the logo. Make sure to display as it is and also if we change color it must take change to the person seeing our report.
+2) We need title "Environmental Alaysis" in the center. Use "Times new roman" font size: 10 bold.
+3) 5 images of Banglore from 2020-2025 with environmental changes. Make sure the image is HD and it must be courasel style.
+4) We need the footer with our comapny mail planet-support@planet.com, and a small quote which must be like "Come again next time"
 
+Logo
+https://storage.googleapis.com/planet-logo/logo.svg
