@@ -1,10 +1,8 @@
-This is a single HTML file that creates a 5-page information site about foods. The first four pages contain detailed textual information about different foods, and the fifth page displays a "More content soon" message.
-```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Foods · 5 pages</title>
   <style>
     * {
@@ -24,7 +22,6 @@ This is a single HTML file that creates a 5-page information site about foods. T
       padding: 1.5rem;
     }
 
-    /* card style – single page view */
     .app {
       max-width: 820px;
       width: 100%;
@@ -35,7 +32,6 @@ This is a single HTML file that creates a 5-page information site about foods. T
       transition: box-shadow 0.2s;
     }
 
-    /* page container */
     .page-container {
       padding: 2.5rem 2.8rem 2.8rem;
     }
@@ -62,6 +58,8 @@ This is a single HTML file that creates a 5-page information site about foods. T
       transition: 0.2s;
       letter-spacing: 0.3px;
       background: #f1ede8;
+      text-decoration: none;
+      display: inline-block;
     }
 
     .nav-btn:hover {
@@ -130,7 +128,7 @@ This is a single HTML file that creates a 5-page information site about foods. T
       opacity: 0.8;
     }
 
-    /* helper: hide all pages by default */
+    /* hide all pages by default */
     .page {
       display: none;
     }
@@ -139,7 +137,6 @@ This is a single HTML file that creates a 5-page information site about foods. T
       display: block;
     }
 
-    /* small screens */
     @media (max-width: 600px) {
       .page-container {
         padding: 1.8rem 1.2rem;
@@ -164,26 +161,42 @@ This is a single HTML file that creates a 5-page information site about foods. T
       }
     }
 
-    /* subtle decoration */
     .food-emojis {
       font-size: 1.5rem;
       margin-right: 0.3rem;
       opacity: 0.8;
     }
+
+    /* small indicator: current page in url */
+    .url-hint {
+      font-size: 0.8rem;
+      color: #8a7e72;
+      margin-top: 1.8rem;
+      border-top: 1px solid #ece5de;
+      padding-top: 1.2rem;
+      text-align: right;
+      letter-spacing: 0.2px;
+      font-family: 'SF Mono', 'Menlo', monospace;
+    }
+
+    .url-hint span {
+      background: #f1ede8;
+      padding: 0.2rem 0.8rem;
+      border-radius: 20px;
+    }
   </style>
 </head>
 <body>
   <div class="app">
-
     <div class="page-container">
 
-      <!-- Navigation (5 tabs) -->
+      <!-- Navigation (5 tabs) — all buttons are plain links using #hash -->
       <div class="nav-tabs" role="tablist">
-        <button class="nav-btn active" data-page="page1">🍕 Pizza</button>
-        <button class="nav-btn" data-page="page2">🍣 Sushi</button>
-        <button class="nav-btn" data-page="page3">🥗 Bowl</button>
-        <button class="nav-btn" data-page="page4">🍲 Stew</button>
-        <button class="nav-btn" data-page="page5">📦 More</button>
+        <a href="#page1" class="nav-btn" data-page="page1">🍕 Pizza</a>
+        <a href="#page2" class="nav-btn" data-page="page2">🍣 Sushi</a>
+        <a href="#page3" class="nav-btn" data-page="page3">🥗 Bowl</a>
+        <a href="#page4" class="nav-btn" data-page="page4">🍲 Stew</a>
+        <a href="#page5" class="nav-btn" data-page="page5">📦 More</a>
       </div>
 
       <!-- PAGES: only text, no images -->
@@ -244,13 +257,18 @@ This is a single HTML file that creates a 5-page information site about foods. T
         </div>
       </div>
 
+      <!-- subtle url indicator: shows current page hash -->
+      <div class="url-hint">
+        <span id="urlDisplay">#page1</span>
+      </div>
+
     </div><!-- /page-container -->
   </div><!-- /app -->
 
   <script>
     (function() {
-      // get all nav buttons and pages
-      const navButtons = document.querySelectorAll('.nav-btn');
+      // Get all nav links (they are <a> with href="#page...")
+      const navLinks = document.querySelectorAll('.nav-btn');
       const pages = {
         page1: document.getElementById('page1'),
         page2: document.getElementById('page2'),
@@ -258,8 +276,9 @@ This is a single HTML file that creates a 5-page information site about foods. T
         page4: document.getElementById('page4'),
         page5: document.getElementById('page5')
       };
+      const urlDisplay = document.getElementById('urlDisplay');
 
-      // helper: switch page
+      // helper: switch page and update URL (hash already changed by <a>)
       function switchPage(pageId) {
         // hide all pages
         Object.values(pages).forEach(page => {
@@ -269,46 +288,73 @@ This is a single HTML file that creates a 5-page information site about foods. T
         const target = pages[pageId];
         if (target) target.classList.add('active-page');
 
-        // update active button
-        navButtons.forEach(btn => {
-          btn.classList.remove('active');
-          if (btn.dataset.page === pageId) {
-            btn.classList.add('active');
+        // update active class on nav links
+        navLinks.forEach(link => {
+          link.classList.remove('active');
+          if (link.dataset.page === pageId) {
+            link.classList.add('active');
           }
         });
+
+        // update the url display (hash is already in location)
+        if (urlDisplay) {
+          urlDisplay.textContent = window.location.hash || '#page1';
+        }
       }
 
-      // attach click event to each button
-      navButtons.forEach(btn => {
-        btn.addEventListener('click', function(e) {
+      // handle click on nav links (they change hash natively)
+      navLinks.forEach(link => {
+        link.addEventListener('click', function(e) {
+          // let the browser update the hash, then we react to hashchange
+          // but we also need to update the page immediately for smoothness.
           const pageId = this.dataset.page;
-          if (pageId) switchPage(pageId);
+          if (pageId) {
+            // we update UI immediately, but the hash will change after click.
+            // we'll also rely on hashchange for syncing, but we do it here too.
+            switchPage(pageId);
+          }
+          // no e.preventDefault() — let the hash update naturally.
         });
       });
 
-      // optional: ensure page1 is active if no hash (already active by default)
-      // but if someone loads with #page2 etc, we can respect it
-      const hash = window.location.hash.replace('#', '');
-      if (hash && pages[hash]) {
-        switchPage(hash);
-      } else {
-        // default: page1 (already active, but ensure button state)
-        const activeBtn = document.querySelector('.nav-btn.active');
-        if (!activeBtn || activeBtn.dataset.page !== 'page1') {
-          switchPage('page1');
-        }
-      }
-
-      // listen to hash changes (optional)
+      // listen to hash changes (back/forward, or manual url change)
       window.addEventListener('hashchange', function() {
-        const newHash = window.location.hash.replace('#', '');
-        if (newHash && pages[newHash]) {
-          switchPage(newHash);
+        const hash = window.location.hash.replace('#', '');
+        if (hash && pages[hash]) {
+          switchPage(hash);
+        } else {
+          // if hash is empty or unknown, fallback to page1
+          if (!hash || !pages[hash]) {
+            window.location.hash = 'page1';
+            switchPage('page1');
+          }
         }
       });
+
+      // initialise: read hash from url on load
+      function initFromHash() {
+        let hash = window.location.hash.replace('#', '');
+        if (!hash || !pages[hash]) {
+          // default to page1
+          hash = 'page1';
+          window.location.hash = 'page1';
+        }
+        switchPage(hash);
+      }
+
+      initFromHash();
+
+      // also update display if user changes hash manually (already covered)
+      // but we also want to reflect if the user types a new hash and presses enter.
+      // hashchange will fire.
+
+      // small extra: if the page is loaded with no hash, we set it.
+      if (!window.location.hash) {
+        window.location.hash = 'page1';
+      }
+
     })();
   </script>
 
 </body>
 </html>
-```
