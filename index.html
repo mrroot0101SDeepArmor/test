@@ -1,0 +1,314 @@
+This is a single HTML file that creates a 5-page information site about foods. The first four pages contain detailed textual information about different foods, and the fifth page displays a "More content soon" message.
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Foods · 5 pages</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+      background: #f7f3ee;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      margin: 0;
+      padding: 1.5rem;
+    }
+
+    /* card style – single page view */
+    .app {
+      max-width: 820px;
+      width: 100%;
+      background: white;
+      border-radius: 2rem;
+      box-shadow: 0 20px 40px -12px rgba(0, 0, 0, 0.25);
+      overflow: hidden;
+      transition: box-shadow 0.2s;
+    }
+
+    /* page container */
+    .page-container {
+      padding: 2.5rem 2.8rem 2.8rem;
+    }
+
+    /* navigation tabs */
+    .nav-tabs {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.4rem 0.2rem;
+      border-bottom: 1px solid #e2dcd6;
+      padding-bottom: 0.85rem;
+      margin-bottom: 2.2rem;
+    }
+
+    .nav-btn {
+      background: transparent;
+      border: none;
+      padding: 0.6rem 1.4rem;
+      font-size: 1rem;
+      font-weight: 500;
+      color: #5b534b;
+      border-radius: 40px;
+      cursor: pointer;
+      transition: 0.2s;
+      letter-spacing: 0.3px;
+      background: #f1ede8;
+    }
+
+    .nav-btn:hover {
+      background: #e6dfd8;
+      color: #2e2720;
+    }
+
+    .nav-btn.active {
+      background: #2e2720;
+      color: white;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.08);
+    }
+
+    /* page content – only text, no images */
+    .page-content {
+      font-size: 1.05rem;
+      line-height: 1.7;
+      color: #1f1b17;
+    }
+
+    .page-content h2 {
+      font-size: 2.2rem;
+      font-weight: 600;
+      letter-spacing: -0.02em;
+      margin-bottom: 1.2rem;
+      color: #1f1b17;
+      border-left: 6px solid #d8b89e;
+      padding-left: 1rem;
+    }
+
+    .page-content p {
+      margin-bottom: 1.4rem;
+    }
+
+    .page-content ul {
+      margin: 0.8rem 0 1.6rem 1.8rem;
+    }
+
+    .page-content li {
+      margin-bottom: 0.5rem;
+    }
+
+    .page-content strong {
+      color: #3f352d;
+      font-weight: 600;
+    }
+
+    .more-soon {
+      text-align: center;
+      padding: 3.5rem 1rem;
+    }
+
+    .more-soon h2 {
+      font-size: 2.8rem;
+      font-weight: 350;
+      letter-spacing: 0.02em;
+      color: #352e27;
+      border-left: none;
+      padding-left: 0;
+    }
+
+    .more-soon p {
+      font-size: 1.3rem;
+      color: #5f5347;
+      margin-top: 0.8rem;
+      opacity: 0.8;
+    }
+
+    /* helper: hide all pages by default */
+    .page {
+      display: none;
+    }
+
+    .page.active-page {
+      display: block;
+    }
+
+    /* small screens */
+    @media (max-width: 600px) {
+      .page-container {
+        padding: 1.8rem 1.2rem;
+      }
+
+      .nav-tabs {
+        gap: 0.3rem;
+        justify-content: center;
+      }
+
+      .nav-btn {
+        padding: 0.4rem 1rem;
+        font-size: 0.9rem;
+      }
+
+      .page-content h2 {
+        font-size: 1.8rem;
+      }
+
+      .more-soon h2 {
+        font-size: 2.2rem;
+      }
+    }
+
+    /* subtle decoration */
+    .food-emojis {
+      font-size: 1.5rem;
+      margin-right: 0.3rem;
+      opacity: 0.8;
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+
+    <div class="page-container">
+
+      <!-- Navigation (5 tabs) -->
+      <div class="nav-tabs" role="tablist">
+        <button class="nav-btn active" data-page="page1">🍕 Pizza</button>
+        <button class="nav-btn" data-page="page2">🍣 Sushi</button>
+        <button class="nav-btn" data-page="page3">🥗 Bowl</button>
+        <button class="nav-btn" data-page="page4">🍲 Stew</button>
+        <button class="nav-btn" data-page="page5">📦 More</button>
+      </div>
+
+      <!-- PAGES: only text, no images -->
+      <!-- PAGE 1: Pizza -->
+      <div id="page1" class="page active-page">
+        <div class="page-content">
+          <h2>🍕 Pizza · classic &amp; contemporary</h2>
+          <p><strong>Pizza</strong> is one of the world’s most beloved foods. Originating in Naples, Italy, it has evolved into countless regional styles. At its core, pizza is a baked flatbread topped with tomato sauce, cheese, and various ingredients.</p>
+          <p><strong>Neapolitan pizza</strong> is the traditional style: a thin, soft crust with San Marzano tomatoes, fresh mozzarella, basil, and olive oil. It is cooked in a wood-fired oven at very high heat for just 60–90 seconds.</p>
+          <p><strong>New York–style pizza</strong> features a large, hand-tossed crust that is crisp and chewy. It is typically sold in wide slices and topped with a rich tomato sauce and mozzarella. Common toppings include pepperoni, sausage, mushrooms, and olives.</p>
+          <p><strong>Chicago deep-dish</strong> is a hearty variation: a buttery, high-edged crust filled with cheese, chunky tomato sauce, and layers of meat or vegetables. It is more like a savoury pie than a flatbread.</p>
+          <p>Beyond these classics, pizza continues to inspire creativity – from gluten-free bases to vegan cheeses and unexpected toppings like figs, prosciutto, or even honey. It remains a universal comfort food.</p>
+        </div>
+      </div>
+
+      <!-- PAGE 2: Sushi -->
+      <div id="page2" class="page">
+        <div class="page-content">
+          <h2>🍣 Sushi · art of simplicity</h2>
+          <p><strong>Sushi</strong> is a Japanese culinary tradition centred on vinegared rice, known as <em>shari</em>, combined with seafood, vegetables, and occasionally tropical fruits. It is not just food; it is an art form that balances flavour, texture, and presentation.</p>
+          <p><strong>Nigiri</strong> is the most iconic form: a hand-pressed mound of rice topped with a slice of fresh fish or seafood, often lightly brushed with soy sauce or wasabi. Common nigiri toppings include salmon, tuna, shrimp, and eel.</p>
+          <p><strong>Maki</strong> (rolls) are made by wrapping rice and fillings in a sheet of nori (seaweed). Variants like the California roll (crab, avocado, cucumber) and the spicy tuna roll have become global favourites. <strong>Uramaki</strong> is an inside-out roll with rice on the outside.</p>
+          <p><strong>Sashimi</strong> is simply fresh, raw fish sliced thinly and served without rice – it highlights the pure taste of the ingredient. Popular sashimi choices are yellowtail, mackerel, and scallop.</p>
+          <p>High-quality sushi relies on the freshest ingredients and the skill of the <em>itamae</em> (chef). The combination of vinegared rice, umami-rich fish, and subtle garnishes like ginger and wasabi creates a balanced and refined dining experience.</p>
+        </div>
+      </div>
+
+      <!-- PAGE 3: Bowl (grain bowl / Buddha bowl) -->
+      <div id="page3" class="page">
+        <div class="page-content">
+          <h2>🥗 Grain bowl · wholesome &amp; vibrant</h2>
+          <p><strong>Buddha bowls</strong> (or grain bowls) are a modern, nutrient-packed meal built around a base of whole grains, fresh vegetables, plant-based protein, and a flavourful dressing. They are endlessly customisable and visually colourful.</p>
+          <p><strong>The base</strong> is often quinoa, brown rice, farro, or barley. These grains provide a hearty texture and a good source of fibre and minerals. Some bowls use mixed greens or roasted sweet potatoes as an alternative base.</p>
+          <p><strong>Vegetables</strong> play a starring role: roasted broccoli, bell peppers, shredded carrots, avocado, radishes, and leafy greens like kale or spinach. They add crunch, sweetness, and a wide range of vitamins.</p>
+          <p><strong>Protein</strong> can come from grilled tofu, tempeh, chickpeas, lentils, or shredded chicken. The bowl is then finished with a drizzle of tahini, lemon-herb vinaigrette, or a spicy peanut sauce. Seeds and nuts (sesame, pumpkin, almonds) add extra texture.</p>
+          <p>This style of eating is appreciated for its balance of macronutrients, vibrant colours, and the freedom to use seasonal produce. It is a wholesome, satisfying meal that works for lunch or dinner.</p>
+        </div>
+      </div>
+
+      <!-- PAGE 4: Stew (hearty slow-cooked) -->
+      <div id="page4" class="page">
+        <div class="page-content">
+          <h2>🍲 Stew · slow &amp; soulful</h2>
+          <p><strong>Stew</strong> is a dish of solid ingredients (meat, fish, or vegetables) cooked slowly in a liquid, often served with its own juices as a sauce. It is a timeless cooking method found in every culture, prized for its depth of flavour and tenderness.</p>
+          <p><strong>Beef bourguignon</strong> is a French classic: beef braised in red wine with onions, carrots, and mushrooms, flavoured with garlic and herbs. The long cooking time transforms tough cuts into meltingly tender morsels.</p>
+          <p><strong>Irish stew</strong> traditionally uses lamb or mutton with potatoes, onions, and parsley. It is a simple, hearty dish that reflects the rustic cuisine of Ireland. In the US, <strong>beef stew</strong> often includes root vegetables like carrots, celery, and parsnips in a rich beef broth.</p>
+          <p>Vegetarian stews are equally satisfying: lentil and vegetable stew, chickpea and spinach tagine, or a rustic mushroom and barley pot. They rely on aromatic spices, tomatoes, and slow simmering to develop a savoury, complex taste.</p>
+          <p>Stew is more than a meal – it is a comforting ritual, often better the next day, and perfect for sharing with family and friends on cool evenings.</p>
+        </div>
+      </div>
+
+      <!-- PAGE 5: More content soon -->
+      <div id="page5" class="page">
+        <div class="page-content more-soon">
+          <h2>📦 More content soon</h2>
+          <p>We are preparing new food stories, recipes, and deep dives.</p>
+          <p style="font-size: 1.1rem; margin-top: 1.8rem; opacity: 0.6;">✨ stay hungry, stay curious ✨</p>
+        </div>
+      </div>
+
+    </div><!-- /page-container -->
+  </div><!-- /app -->
+
+  <script>
+    (function() {
+      // get all nav buttons and pages
+      const navButtons = document.querySelectorAll('.nav-btn');
+      const pages = {
+        page1: document.getElementById('page1'),
+        page2: document.getElementById('page2'),
+        page3: document.getElementById('page3'),
+        page4: document.getElementById('page4'),
+        page5: document.getElementById('page5')
+      };
+
+      // helper: switch page
+      function switchPage(pageId) {
+        // hide all pages
+        Object.values(pages).forEach(page => {
+          if (page) page.classList.remove('active-page');
+        });
+        // show selected page
+        const target = pages[pageId];
+        if (target) target.classList.add('active-page');
+
+        // update active button
+        navButtons.forEach(btn => {
+          btn.classList.remove('active');
+          if (btn.dataset.page === pageId) {
+            btn.classList.add('active');
+          }
+        });
+      }
+
+      // attach click event to each button
+      navButtons.forEach(btn => {
+        btn.addEventListener('click', function(e) {
+          const pageId = this.dataset.page;
+          if (pageId) switchPage(pageId);
+        });
+      });
+
+      // optional: ensure page1 is active if no hash (already active by default)
+      // but if someone loads with #page2 etc, we can respect it
+      const hash = window.location.hash.replace('#', '');
+      if (hash && pages[hash]) {
+        switchPage(hash);
+      } else {
+        // default: page1 (already active, but ensure button state)
+        const activeBtn = document.querySelector('.nav-btn.active');
+        if (!activeBtn || activeBtn.dataset.page !== 'page1') {
+          switchPage('page1');
+        }
+      }
+
+      // listen to hash changes (optional)
+      window.addEventListener('hashchange', function() {
+        const newHash = window.location.hash.replace('#', '');
+        if (newHash && pages[newHash]) {
+          switchPage(newHash);
+        }
+      });
+    })();
+  </script>
+
+</body>
+</html>
+```
